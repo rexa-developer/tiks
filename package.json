@@ -2,6 +2,14 @@
   "name": "@rexa-developer/tiks",
   "version": "0.1.0",
   "description": "Procedural UI sounds for the web. Zero audio files. Pure synthesis.",
+  "homepage": "https://rexa-developer.github.io/tiks",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/rexa-developer/tiks.git"
+  },
+  "bugs": {
+    "url": "https://github.com/rexa-developer/tiks/issues"
+  },
   "type": "module",
   "exports": {
     ".": {
