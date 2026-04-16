@@ -54,7 +54,7 @@ describe('ThemeRegistry', () => {
   })
 
   it('CRISP_THEME has expected values', () => {
-    expect(CRISP_THEME.baseFreq).toBe(660)
+    expect(CRISP_THEME.baseFreq).toBe(523)
     expect(CRISP_THEME.oscType).toBe('triangle')
     expect(CRISP_THEME.decay).toBe(0.6)
   })

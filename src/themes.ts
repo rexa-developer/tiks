@@ -3,25 +3,25 @@ import type { TiksTheme, ThemeName } from './types'
 export const SOFT_THEME: TiksTheme = {
   name: 'soft',
   baseFreq: 440,
-  noiseColor: 'white',
+  noiseColor: 'pink',
   oscType: 'sine',
   filterFreq: 3000,
   filterQ: 0.7,
   attack: 0.002,
   decay: 1.0,
-  brightness: 200,
+  brightness: 2000,
 }
 
 export const CRISP_THEME: TiksTheme = {
   name: 'crisp',
-  baseFreq: 660,
+  baseFreq: 523,
   noiseColor: 'white',
   oscType: 'triangle',
   filterFreq: 5000,
   filterQ: 1.2,
-  attack: 0.001,
+  attack: 0.0015,
   decay: 0.6,
-  brightness: 800,
+  brightness: 4000,
 }
 
 const themes: Record<ThemeName, TiksTheme> = {
