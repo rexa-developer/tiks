@@ -29,7 +29,7 @@ const themes: Record<ThemeName, TiksTheme> = {
   crisp: CRISP_THEME,
 }
 
-export function resolveTheme(theme: string | TiksTheme): TiksTheme {
+export function resolveTheme(theme: ThemeName | TiksTheme): TiksTheme {
   if (typeof theme === 'string') {
     const found = themes[theme as ThemeName]
     if (!found) throw new Error(`Unknown theme: "${theme}"`)

@@ -1,9 +1,19 @@
 let whiteBuffer: AudioBuffer | null = null
 let pinkBuffer: AudioBuffer | null = null
+let cachedCtx: AudioContext | null = null
+
+function ensureFreshCache(ctx: AudioContext) {
+  if (cachedCtx !== ctx) {
+    whiteBuffer = null
+    pinkBuffer = null
+    cachedCtx = ctx
+  }
+}
 
 export function getWhiteNoise(ctx: AudioContext): AudioBuffer {
+  ensureFreshCache(ctx)
   if (whiteBuffer) return whiteBuffer
-  const length = ctx.sampleRate * 0.5
+  const length = Math.floor(ctx.sampleRate * 0.5)
   const buffer = ctx.createBuffer(1, length, ctx.sampleRate)
   const data = buffer.getChannelData(0)
   for (let i = 0; i < length; i++) {
@@ -14,12 +24,13 @@ export function getWhiteNoise(ctx: AudioContext): AudioBuffer {
 }
 
 export function getPinkNoise(ctx: AudioContext): AudioBuffer {
+  ensureFreshCache(ctx)
   if (pinkBuffer) return pinkBuffer
-  const length = ctx.sampleRate * 0.5
+  const length = Math.floor(ctx.sampleRate * 0.5)
   const buffer = ctx.createBuffer(1, length, ctx.sampleRate)
   const data = buffer.getChannelData(0)
 
-  // Voss-McCartney algorithm with 3 rows
+  // Voss-McCartney algorithm
   let b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0
   for (let i = 0; i < length; i++) {
     const white = Math.random() * 2 - 1
@@ -40,4 +51,5 @@ export function getPinkNoise(ctx: AudioContext): AudioBuffer {
 export function resetNoiseBuffers() {
   whiteBuffer = null
   pinkBuffer = null
+  cachedCtx = null
 }

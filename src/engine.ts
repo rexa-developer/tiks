@@ -1,5 +1,4 @@
 import type { SoundGenerator, TiksOptions, TiksTheme } from './types'
-import { resolveTheme } from './themes'
 
 class AudioEngine {
   private ctx: AudioContext | null = null
@@ -8,12 +7,15 @@ class AudioEngine {
   private _volume = 0.3
 
   init(options?: TiksOptions) {
-    this.ctx = new AudioContext()
-    this.masterGain = this.ctx.createGain()
-    this.masterGain.connect(this.ctx.destination)
+    // Reuse existing context instead of leaking a new one
+    if (!this.ctx || this.ctx.state === 'closed') {
+      this.ctx = new AudioContext()
+      this.masterGain = this.ctx.createGain()
+      this.masterGain.connect(this.ctx.destination)
+    }
 
-    if (options?.volume !== undefined) this._volume = options.volume
-    this.masterGain.gain.value = this._volume
+    if (options?.volume !== undefined) this._volume = Math.max(0, Math.min(1, options.volume))
+    this.masterGain!.gain.value = this._volume
 
     if (options?.muted) this._muted = true
 
@@ -32,7 +34,7 @@ class AudioEngine {
   }
 
   ensureContext(): AudioContext {
-    if (!this.ctx) {
+    if (!this.ctx || this.ctx.state === 'closed') {
       this.ctx = new AudioContext()
       this.masterGain = this.ctx.createGain()
       this.masterGain.connect(this.ctx.destination)
@@ -64,9 +66,9 @@ class AudioEngine {
   }
 
   setVolume(v: number) {
-    this._volume = v
+    this._volume = Math.max(0, Math.min(1, v))
     if (this.masterGain) {
-      this.masterGain.gain.value = v
+      this.masterGain.gain.value = this._volume
     }
   }
 

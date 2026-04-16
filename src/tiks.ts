@@ -1,4 +1,4 @@
-import type { TiksOptions, TiksTheme } from './types'
+import type { TiksOptions, TiksTheme, ThemeName } from './types'
 import { audioEngine } from './engine'
 import { resolveTheme, SOFT_THEME } from './themes'
 import * as generators from './generators'
@@ -61,7 +61,7 @@ export class TiksEngine {
     audioEngine.setVolume(v)
   }
 
-  setTheme(t: string | TiksTheme) {
+  setTheme(t: ThemeName | TiksTheme) {
     this.theme = resolveTheme(t)
   }
 }

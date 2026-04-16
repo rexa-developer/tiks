@@ -1,6 +1,6 @@
 import { useEffect, useRef, useMemo } from 'react'
 import { TiksEngine } from './tiks'
-import type { TiksOptions, TiksTheme } from './types'
+import type { TiksOptions, TiksTheme, ThemeName } from './types'
 
 export function useTiks(options?: TiksOptions) {
   const engineRef = useRef<TiksEngine | null>(null)
@@ -9,9 +9,13 @@ export function useTiks(options?: TiksOptions) {
     engineRef.current = new TiksEngine()
   }
 
+  const theme = typeof options?.theme === 'string' ? options.theme : options?.theme?.name
+  const volume = options?.volume
+  const muted = options?.muted
+
   useEffect(() => {
     engineRef.current!.init(options)
-  }, [])
+  }, [theme, volume, muted])
 
   return useMemo(() => {
     const engine = engineRef.current!
@@ -28,7 +32,7 @@ export function useTiks(options?: TiksOptions) {
       mute: () => engine.mute(),
       unmute: () => engine.unmute(),
       setVolume: (v: number) => engine.setVolume(v),
-      setTheme: (t: string | TiksTheme) => engine.setTheme(t),
+      setTheme: (t: ThemeName | TiksTheme) => engine.setTheme(t),
     }
   }, [])
 }

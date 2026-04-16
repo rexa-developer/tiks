@@ -2,9 +2,9 @@ import type { SoundGenerator } from '../types'
 
 export const click: SoundGenerator = (ctx, dest, theme) => {
   const now = ctx.currentTime
-  const duration = 0.03 * theme.decay
+  const duration = Math.max(0.03 * theme.decay, 0.005)
 
-  const bufferSize = Math.floor(ctx.sampleRate * duration)
+  const bufferSize = Math.max(Math.floor(ctx.sampleRate * duration), 1)
   const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate)
   const data = buffer.getChannelData(0)
   for (let i = 0; i < bufferSize; i++) {
@@ -20,7 +20,8 @@ export const click: SoundGenerator = (ctx, dest, theme) => {
   filter.Q.value = theme.filterQ
 
   const gain = ctx.createGain()
-  gain.gain.setValueAtTime(0.3, now)
+  gain.gain.setValueAtTime(0.001, now)
+  gain.gain.linearRampToValueAtTime(0.3, now + Math.min(theme.attack, duration * 0.5))
   gain.gain.exponentialRampToValueAtTime(0.001, now + duration)
 
   noise.connect(filter)

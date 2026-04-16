@@ -1,4 +1,4 @@
-import type { TiksOptions, TiksTheme } from './types'
+import type { TiksOptions, TiksTheme, ThemeName } from './types'
 import { tiks, TiksEngine } from './tiks'
 
 // Class API
@@ -24,4 +24,4 @@ export function notify() { tiks.notify() }
 export function mute() { tiks.mute() }
 export function unmute() { tiks.unmute() }
 export function setVolume(v: number) { tiks.setVolume(v) }
-export function setTheme(t: string | TiksTheme) { tiks.setTheme(t) }
+export function setTheme(t: ThemeName | TiksTheme) { tiks.setTheme(t) }

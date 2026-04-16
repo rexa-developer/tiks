@@ -2,7 +2,7 @@ import type { SoundGenerator } from '../types'
 
 export const error: SoundGenerator = (ctx, dest, theme) => {
   const now = ctx.currentTime
-  const duration = 0.15 * theme.decay
+  const duration = Math.max(0.15 * theme.decay, 0.005)
 
   // Low buzz with pitch drop for "thud" feel
   const osc = ctx.createOscillator()
@@ -11,7 +11,8 @@ export const error: SoundGenerator = (ctx, dest, theme) => {
   osc.frequency.exponentialRampToValueAtTime(180 * (theme.baseFreq / 440), now + duration)
 
   const gain = ctx.createGain()
-  gain.gain.setValueAtTime(0.25, now)
+  gain.gain.setValueAtTime(0.001, now)
+  gain.gain.linearRampToValueAtTime(0.25, now + theme.attack)
   gain.gain.exponentialRampToValueAtTime(0.001, now + duration)
 
   osc.connect(gain)
@@ -20,8 +21,8 @@ export const error: SoundGenerator = (ctx, dest, theme) => {
   osc.stop(now + duration)
 
   // Noise thud through lowpass
-  const noiseDuration = 0.1 * theme.decay
-  const bufSize = Math.floor(ctx.sampleRate * noiseDuration)
+  const noiseDuration = Math.max(0.1 * theme.decay, 0.005)
+  const bufSize = Math.max(Math.floor(ctx.sampleRate * noiseDuration), 1)
   const buf = ctx.createBuffer(1, bufSize, ctx.sampleRate)
   const data = buf.getChannelData(0)
   for (let i = 0; i < bufSize; i++) data[i] = Math.random() * 2 - 1

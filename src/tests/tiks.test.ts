@@ -23,6 +23,7 @@ describe('TiksEngine', () => {
   })
 
   it('setTheme throws on unknown theme', () => {
+    // @ts-expect-error testing runtime behavior with invalid input
     expect(() => tiks.setTheme('unknown')).toThrow('Unknown theme')
   })
 

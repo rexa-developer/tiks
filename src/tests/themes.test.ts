@@ -11,6 +11,7 @@ describe('ThemeRegistry', () => {
   })
 
   it('resolveTheme with unknown string throws', () => {
+    // @ts-expect-error testing runtime behavior with invalid input
     expect(() => resolveTheme('nope')).toThrow('Unknown theme: "nope"')
   })
 

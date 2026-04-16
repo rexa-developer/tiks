@@ -449,71 +449,7 @@
     // Waveform visualizer
     const canvas = document.getElementById('waveform')
     const canvasCtx = canvas.getContext('2d')
-    let analyser = null
-    let dataArray = null
     let animId = null
-
-    function setupAnalyser() {
-      const audioCtx = tiks._getAudioContext?.() || null
-      // We'll create our own analyser from the audio context
-      // For the demo, we draw a static waveform on sound trigger
-    }
-
-    function drawWaveform() {
-      const w = canvas.width = canvas.offsetWidth * 2
-      const h = canvas.height = 200
-
-      canvasCtx.fillStyle = '#14141f'
-      canvasCtx.fillRect(0, 0, w, h)
-
-      if (!analyser || !dataArray) {
-        // Draw idle line
-        canvasCtx.strokeStyle = '#2a2a3a'
-        canvasCtx.lineWidth = 2
-        canvasCtx.beginPath()
-        canvasCtx.moveTo(0, h / 2)
-        canvasCtx.lineTo(w, h / 2)
-        canvasCtx.stroke()
-        return
-      }
-
-      analyser.getByteTimeDomainData(dataArray)
-
-      canvasCtx.strokeStyle = '#6c5ce7'
-      canvasCtx.lineWidth = 2
-      canvasCtx.beginPath()
-
-      const sliceWidth = w / dataArray.length
-      let x = 0
-
-      for (let i = 0; i < dataArray.length; i++) {
-        const v = dataArray[i] / 128.0
-        const y = (v * h) / 2
-        if (i === 0) canvasCtx.moveTo(x, y)
-        else canvasCtx.lineTo(x, y)
-        x += sliceWidth
-      }
-
-      canvasCtx.lineTo(w, h / 2)
-      canvasCtx.stroke()
-
-      animId = requestAnimationFrame(drawWaveform)
-    }
-
-    // Try to set up real analyser after first interaction
-    let analyserSetup = false
-    function ensureAnalyser() {
-      if (analyserSetup) return
-      analyserSetup = true
-
-      // Access the audio context through the engine
-      // We need to hook into the master gain
-      try {
-        const audioCtx = new AudioContext()
-        // We'll use a simulated waveform since we can't easily tap into tiks internals
-        // Instead, animate on each sound play
-      } catch (e) {}
-    }
 
     // Simulated waveform animation on sound play
     let wavePhase = 0
@@ -569,7 +505,18 @@
     }
 
     // Draw idle state
-    drawWaveform()
+    {
+      const w = canvas.width = canvas.offsetWidth * 2
+      const h = canvas.height = 200
+      canvasCtx.fillStyle = '#14141f'
+      canvasCtx.fillRect(0, 0, w, h)
+      canvasCtx.strokeStyle = '#2a2a3a'
+      canvasCtx.lineWidth = 2
+      canvasCtx.beginPath()
+      canvasCtx.moveTo(0, h / 2)
+      canvasCtx.lineTo(w, h / 2)
+      canvasCtx.stroke()
+    }
 
     // Sound waveform configs
     const waveConfigs = {
