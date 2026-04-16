@@ -135,6 +135,8 @@ function ToggleButton() {
 
 The hook auto-initializes on mount. All returned methods are stable references.
 
+> **Note:** `volume` and `muted` are shared globally across all `useTiks` hooks (they live on the underlying audio engine). `theme` is per-hook. If two hooks pass different `volume` values, the last-mounted one wins.
+
 ## Tree-Shakeable Imports
 
 For minimal bundles, import only the sounds you need:

@@ -9,5 +9,6 @@ export default defineConfig({
   dts: true,
   minify: true,
   treeshake: true,
+  clean: true,
   external: ['react'],
 })
