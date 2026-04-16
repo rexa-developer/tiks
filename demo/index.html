@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>tiks — Procedural UI Sounds for the Web</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0a0a0f;
+      --surface: #14141f;
+      --border: #2a2a3a;
+      --text: #e8e8f0;
+      --text-dim: #8888a0;
+      --accent: #6c5ce7;
+      --accent-hover: #7c6cf7;
+      --success: #2ecc71;
+      --error: #e74c3c;
+      --warning: #f39c12;
+      --radius: 10px;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem;
+    }
+
+    /* Hero */
+    .hero {
+      text-align: center;
+      padding: 4rem 0 3rem;
+    }
+
+    .hero h1 {
+      font-size: 2.4rem;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      margin-bottom: 0.5rem;
+    }
+
+    .hero h1 span {
+      color: var(--accent);
+    }
+
+    .hero p {
+      color: var(--text-dim);
+      font-size: 1.1rem;
+      margin-bottom: 2rem;
+    }
+
+    .hero-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 1rem 2.5rem;
+      font-size: 1.2rem;
+      font-weight: 600;
+      background: var(--accent);
+      color: white;
+      border: none;
+      border-radius: var(--radius);
+      cursor: pointer;
+      transition: background 0.15s, transform 0.1s;
+    }
+
+    .hero-btn:hover { background: var(--accent-hover); }
+    .hero-btn:active { transform: scale(0.97); }
+
+    /* Badges */
+    .badges {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      margin-top: 1.5rem;
+      flex-wrap: wrap;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 0.3rem 0.8rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+      border-radius: 20px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text-dim);
+      font-family: 'SF Mono', Menlo, monospace;
+    }
+
+    /* Section */
+    section {
+      margin-bottom: 3rem;
+    }
+
+    section h2 {
+      font-size: 1.3rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      color: var(--text);
+    }
+
+    /* Sound Grid */
+    .sound-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 0.75rem;
+    }
+
+    .sound-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 1.2rem 0.8rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      color: var(--text);
+      font-size: 0.85rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: border-color 0.15s, transform 0.1s;
+    }
+
+    .sound-btn:hover {
+      border-color: var(--accent);
+    }
+
+    .sound-btn:active {
+      transform: scale(0.95);
+    }
+
+    .sound-btn .label {
+      font-family: 'SF Mono', Menlo, monospace;
+      font-size: 0.75rem;
+      color: var(--text-dim);
+    }
+
+    .sound-btn.success-btn:hover { border-color: var(--success); }
+    .sound-btn.error-btn:hover { border-color: var(--error); }
+    .sound-btn.warning-btn:hover { border-color: var(--warning); }
+
+    /* Toggle */
+    .toggle-row {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 1rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      margin-bottom: 0.75rem;
+    }
+
+    .toggle-switch {
+      position: relative;
+      width: 52px;
+      height: 28px;
+      background: var(--border);
+      border-radius: 14px;
+      cursor: pointer;
+      transition: background 0.2s;
+      border: none;
+    }
+
+    .toggle-switch.on {
+      background: var(--accent);
+    }
+
+    .toggle-switch::after {
+      content: '';
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      width: 22px;
+      height: 22px;
+      background: white;
+      border-radius: 50%;
+      transition: transform 0.2s;
+    }
+
+    .toggle-switch.on::after {
+      transform: translateX(24px);
+    }
+
+    /* Theme Switcher */
+    .theme-switcher {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .theme-btn {
+      padding: 0.6rem 1.5rem;
+      background: var(--surface);
+      border: 2px solid var(--border);
+      border-radius: var(--radius);
+      color: var(--text-dim);
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: border-color 0.15s, color 0.15s;
+    }
+
+    .theme-btn.active {
+      border-color: var(--accent);
+      color: var(--text);
+    }
+
+    .theme-btn:hover:not(.active) {
+      border-color: var(--text-dim);
+    }
+
+    /* Waveform */
+    .visualizer {
+      margin-top: 1.5rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+
+    canvas {
+      display: block;
+      width: 100%;
+      height: 100px;
+    }
+
+    /* Code */
+    .code-block {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.2rem;
+      font-family: 'SF Mono', Menlo, monospace;
+      font-size: 0.82rem;
+      line-height: 1.7;
+      overflow-x: auto;
+      color: var(--text-dim);
+    }
+
+    .code-block .kw { color: #c792ea; }
+    .code-block .fn { color: #82aaff; }
+    .code-block .str { color: #c3e88d; }
+    .code-block .cmt { color: #546e7a; }
+
+    /* Install */
+    .install {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1rem 1.5rem;
+      font-family: 'SF Mono', Menlo, monospace;
+      font-size: 0.9rem;
+    }
+
+    .install .dollar {
+      color: var(--text-dim);
+      user-select: none;
+    }
+
+    .install .cmd {
+      color: var(--text);
+      flex: 1;
+    }
+
+    .copy-btn {
+      padding: 0.3rem 0.8rem;
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text-dim);
+      font-size: 0.75rem;
+      cursor: pointer;
+      transition: border-color 0.15s;
+    }
+
+    .copy-btn:hover { border-color: var(--accent); color: var(--text); }
+
+    /* Volume */
+    .volume-row {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .volume-row label {
+      font-size: 0.85rem;
+      color: var(--text-dim);
+      min-width: 60px;
+    }
+
+    input[type="range"] {
+      flex: 1;
+      accent-color: var(--accent);
+    }
+
+    /* Footer */
+    footer {
+      text-align: center;
+      padding: 2rem 0;
+      color: var(--text-dim);
+      font-size: 0.8rem;
+    }
+
+    footer a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    footer a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Hero -->
+    <div class="hero">
+      <h1>The web has been silent.<br><span>tiks</span> makes it sing.</h1>
+      <p>Procedural UI sounds. Zero audio files. Pure synthesis.</p>
+      <button class="hero-btn" id="heroBtn">Click me</button>
+      <div class="badges">
+        <span class="badge">~2KB gzipped</span>
+        <span class="badge">0 dependencies</span>
+        <span class="badge">Web Audio API</span>
+      </div>
+    </div>
+
+    <!-- Waveform Visualizer -->
+    <section>
+      <div class="visualizer">
+        <canvas id="waveform" height="100"></canvas>
+      </div>
+    </section>
+
+    <!-- Volume Control -->
+    <section>
+      <div class="volume-row">
+        <label>Volume</label>
+        <input type="range" id="volume" min="0" max="100" value="30">
+        <span id="volumeLabel" style="font-size:0.8rem; color:var(--text-dim); min-width:35px;">30%</span>
+      </div>
+    </section>
+
+    <!-- Theme Switcher -->
+    <section>
+      <h2>Themes</h2>
+      <div class="theme-switcher">
+        <button class="theme-btn active" data-theme="soft">Soft</button>
+        <button class="theme-btn" data-theme="crisp">Crisp</button>
+      </div>
+    </section>
+
+    <!-- Sound Playground -->
+    <section>
+      <h2>Sounds</h2>
+      <div class="sound-grid">
+        <button class="sound-btn" data-sound="click">
+          Click
+          <span class="label">click()</span>
+        </button>
+        <button class="sound-btn success-btn" data-sound="success">
+          Success
+          <span class="label">success()</span>
+        </button>
+        <button class="sound-btn error-btn" data-sound="error">
+          Error
+          <span class="label">error()</span>
+        </button>
+        <button class="sound-btn warning-btn" data-sound="warning">
+          Warning
+          <span class="label">warning()</span>
+        </button>
+        <button class="sound-btn" data-sound="hover">
+          Hover
+          <span class="label">hover()</span>
+        </button>
+        <button class="sound-btn" data-sound="pop">
+          Pop
+          <span class="label">pop()</span>
+        </button>
+        <button class="sound-btn" data-sound="swoosh">
+          Swoosh
+          <span class="label">swoosh()</span>
+        </button>
+        <button class="sound-btn" data-sound="notify">
+          Notify
+          <span class="label">notify()</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- Toggle Demo -->
+    <section>
+      <h2>Toggle</h2>
+      <div class="toggle-row">
+        <button class="toggle-switch" id="toggleSwitch"></button>
+        <span id="toggleLabel" style="font-size:0.85rem; color:var(--text-dim);">toggle(false)</span>
+      </div>
+    </section>
+
+    <!-- Code -->
+    <section>
+      <h2>Setup</h2>
+      <div class="code-block">
+        <span class="kw">import</span> { <span class="fn">tiks</span> } <span class="kw">from</span> <span class="str">'tiks'</span><br><br>
+        <span class="cmt">// Initialize on first gesture</span><br>
+        <span class="fn">tiks</span>.<span class="fn">init</span>()<br><br>
+        <span class="cmt">// Play sounds</span><br>
+        <span class="fn">tiks</span>.<span class="fn">click</span>()<br>
+        <span class="fn">tiks</span>.<span class="fn">success</span>()<br>
+        <span class="fn">tiks</span>.<span class="fn">toggle</span>(<span class="kw">true</span>)
+      </div>
+    </section>
+
+    <!-- Install -->
+    <section>
+      <div class="install">
+        <span class="dollar">$</span>
+        <span class="cmd">npm install tiks</span>
+        <button class="copy-btn" id="copyBtn">Copy</button>
+      </div>
+    </section>
+
+    <footer>
+      MIT License &middot; <a href="https://github.com/saifulapm/tiks">GitHub</a>
+    </footer>
+  </div>
+
+  <script type="module">
+    // Import from dist
+    import { tiks } from '../dist/index.js'
+
+    // Init
+    tiks.init({ volume: 0.3 })
+
+    // Waveform visualizer
+    const canvas = document.getElementById('waveform')
+    const canvasCtx = canvas.getContext('2d')
+    let analyser = null
+    let dataArray = null
+    let animId = null
+
+    function setupAnalyser() {
+      const audioCtx = tiks._getAudioContext?.() || null
+      // We'll create our own analyser from the audio context
+      // For the demo, we draw a static waveform on sound trigger
+    }
+
+    function drawWaveform() {
+      const w = canvas.width = canvas.offsetWidth * 2
+      const h = canvas.height = 200
+
+      canvasCtx.fillStyle = '#14141f'
+      canvasCtx.fillRect(0, 0, w, h)
+
+      if (!analyser || !dataArray) {
+        // Draw idle line
+        canvasCtx.strokeStyle = '#2a2a3a'
+        canvasCtx.lineWidth = 2
+        canvasCtx.beginPath()
+        canvasCtx.moveTo(0, h / 2)
+        canvasCtx.lineTo(w, h / 2)
+        canvasCtx.stroke()
+        return
+      }
+
+      analyser.getByteTimeDomainData(dataArray)
+
+      canvasCtx.strokeStyle = '#6c5ce7'
+      canvasCtx.lineWidth = 2
+      canvasCtx.beginPath()
+
+      const sliceWidth = w / dataArray.length
+      let x = 0
+
+      for (let i = 0; i < dataArray.length; i++) {
+        const v = dataArray[i] / 128.0
+        const y = (v * h) / 2
+        if (i === 0) canvasCtx.moveTo(x, y)
+        else canvasCtx.lineTo(x, y)
+        x += sliceWidth
+      }
+
+      canvasCtx.lineTo(w, h / 2)
+      canvasCtx.stroke()
+
+      animId = requestAnimationFrame(drawWaveform)
+    }
+
+    // Try to set up real analyser after first interaction
+    let analyserSetup = false
+    function ensureAnalyser() {
+      if (analyserSetup) return
+      analyserSetup = true
+
+      // Access the audio context through the engine
+      // We need to hook into the master gain
+      try {
+        const audioCtx = new AudioContext()
+        // We'll use a simulated waveform since we can't easily tap into tiks internals
+        // Instead, animate on each sound play
+      } catch (e) {}
+    }
+
+    // Simulated waveform animation on sound play
+    let wavePhase = 0
+    let waveAmplitude = 0
+    let waveFreq = 4
+    let waveDecay = 0
+
+    function triggerWave(amplitude = 1, freq = 4) {
+      waveAmplitude = amplitude
+      waveFreq = freq
+      waveDecay = 0.95
+      if (!animId) animateWave()
+    }
+
+    function animateWave() {
+      const w = canvas.width = canvas.offsetWidth * 2
+      const h = canvas.height = 200
+
+      canvasCtx.fillStyle = '#14141f'
+      canvasCtx.fillRect(0, 0, w, h)
+
+      canvasCtx.strokeStyle = waveAmplitude > 0.01 ? '#6c5ce7' : '#2a2a3a'
+      canvasCtx.lineWidth = 2
+      canvasCtx.beginPath()
+
+      for (let x = 0; x < w; x++) {
+        const t = x / w
+        const y = h / 2 + Math.sin(t * Math.PI * 2 * waveFreq + wavePhase) * waveAmplitude * (h * 0.35) * Math.sin(t * Math.PI)
+        if (x === 0) canvasCtx.moveTo(x, y)
+        else canvasCtx.lineTo(x, y)
+      }
+
+      canvasCtx.stroke()
+
+      wavePhase += 0.15
+      waveAmplitude *= waveDecay
+
+      if (waveAmplitude > 0.005) {
+        animId = requestAnimationFrame(animateWave)
+      } else {
+        waveAmplitude = 0
+        animId = null
+        // Draw idle
+        canvasCtx.fillStyle = '#14141f'
+        canvasCtx.fillRect(0, 0, w, h)
+        canvasCtx.strokeStyle = '#2a2a3a'
+        canvasCtx.lineWidth = 2
+        canvasCtx.beginPath()
+        canvasCtx.moveTo(0, h / 2)
+        canvasCtx.lineTo(w, h / 2)
+        canvasCtx.stroke()
+      }
+    }
+
+    // Draw idle state
+    drawWaveform()
+
+    // Sound waveform configs
+    const waveConfigs = {
+      click: { amp: 0.8, freq: 12 },
+      success: { amp: 1, freq: 6 },
+      error: { amp: 0.7, freq: 3 },
+      warning: { amp: 0.6, freq: 8 },
+      hover: { amp: 0.2, freq: 15 },
+      pop: { amp: 0.9, freq: 10 },
+      swoosh: { amp: 0.6, freq: 5 },
+      notify: { amp: 0.8, freq: 7 },
+    }
+
+    // Hero button
+    document.getElementById('heroBtn').addEventListener('click', () => {
+      tiks.click()
+      triggerWave(0.8, 12)
+    })
+
+    // Sound buttons
+    document.querySelectorAll('.sound-btn').forEach(btn => {
+      const sound = btn.dataset.sound
+      btn.addEventListener('click', () => {
+        tiks[sound]()
+        const cfg = waveConfigs[sound] || { amp: 0.5, freq: 5 }
+        triggerWave(cfg.amp, cfg.freq)
+      })
+
+      // Hover sound
+      if (sound === 'hover') {
+        btn.addEventListener('mouseenter', () => {
+          tiks.hover()
+          triggerWave(0.15, 15)
+        })
+      }
+    })
+
+    // Toggle
+    let toggleState = false
+    const toggleSwitch = document.getElementById('toggleSwitch')
+    const toggleLabel = document.getElementById('toggleLabel')
+
+    toggleSwitch.addEventListener('click', () => {
+      toggleState = !toggleState
+      tiks.toggle(toggleState)
+      toggleSwitch.classList.toggle('on', toggleState)
+      toggleLabel.textContent = `toggle(${toggleState})`
+      triggerWave(0.6, toggleState ? 8 : 5)
+    })
+
+    // Theme switcher
+    document.querySelectorAll('.theme-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.theme-btn').forEach(b => b.classList.remove('active'))
+        btn.classList.add('active')
+        tiks.setTheme(btn.dataset.theme)
+        tiks.click()
+        triggerWave(0.5, 8)
+      })
+    })
+
+    // Volume
+    const volumeSlider = document.getElementById('volume')
+    const volumeLabel = document.getElementById('volumeLabel')
+    volumeSlider.addEventListener('input', (e) => {
+      const v = e.target.value / 100
+      tiks.setVolume(v)
+      volumeLabel.textContent = `${e.target.value}%`
+    })
+
+    // Copy button
+    document.getElementById('copyBtn').addEventListener('click', () => {
+      navigator.clipboard.writeText('npm install tiks')
+      const btn = document.getElementById('copyBtn')
+      btn.textContent = 'Copied!'
+      tiks.success()
+      triggerWave(0.8, 6)
+      setTimeout(() => btn.textContent = 'Copy', 1500)
+    })
+  </script>
+</body>
+</html>
