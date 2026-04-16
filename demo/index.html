@@ -441,10 +441,20 @@
 
   <script type="module">
     // Import from dist
-    import { tiks } from 'https://esm.sh/@rexa-developer/tiks'
+    import { tiks } from 'https://esm.sh/@rexa-developer/tiks@0.1.4'
 
-    // Init
-    tiks.init({ volume: 0.3 })
+    // iOS Safari requires AudioContext creation inside a user gesture.
+    // Defer init to first pointer/touch/key event.
+    let audioReady = false
+    function ensureAudio() {
+      if (audioReady) return
+      audioReady = true
+      tiks.init({ volume: 0.3 })
+    }
+    const gestureEvents = ['pointerdown', 'touchstart', 'keydown']
+    gestureEvents.forEach(evt =>
+      window.addEventListener(evt, ensureAudio, { once: true, capture: true })
+    )
 
     // Waveform visualizer
     const canvas = document.getElementById('waveform')
