@@ -2,15 +2,16 @@ import type { SoundGenerator } from '../types'
 
 export const error: SoundGenerator = (ctx, dest, theme) => {
   const now = ctx.currentTime
-  const duration = 0.12 * theme.decay
+  const duration = 0.15 * theme.decay
 
-  // Low triangle buzz
+  // Low buzz with pitch drop for "thud" feel
   const osc = ctx.createOscillator()
-  osc.type = 'triangle'
-  osc.frequency.value = 150 * (theme.baseFreq / 440)
+  osc.type = theme.oscType
+  osc.frequency.setValueAtTime(280 * (theme.baseFreq / 440), now)
+  osc.frequency.exponentialRampToValueAtTime(180 * (theme.baseFreq / 440), now + duration)
 
   const gain = ctx.createGain()
-  gain.gain.setValueAtTime(0.2, now)
+  gain.gain.setValueAtTime(0.25, now)
   gain.gain.exponentialRampToValueAtTime(0.001, now + duration)
 
   osc.connect(gain)
@@ -19,7 +20,8 @@ export const error: SoundGenerator = (ctx, dest, theme) => {
   osc.stop(now + duration)
 
   // Noise thud through lowpass
-  const bufSize = Math.floor(ctx.sampleRate * 0.08 * theme.decay)
+  const noiseDuration = 0.1 * theme.decay
+  const bufSize = Math.floor(ctx.sampleRate * noiseDuration)
   const buf = ctx.createBuffer(1, bufSize, ctx.sampleRate)
   const data = buf.getChannelData(0)
   for (let i = 0; i < bufSize; i++) data[i] = Math.random() * 2 - 1
@@ -29,15 +31,15 @@ export const error: SoundGenerator = (ctx, dest, theme) => {
 
   const filter = ctx.createBiquadFilter()
   filter.type = 'lowpass'
-  filter.frequency.value = 500
+  filter.frequency.value = 600
 
   const nGain = ctx.createGain()
-  nGain.gain.setValueAtTime(0.1, now)
-  nGain.gain.exponentialRampToValueAtTime(0.001, now + 0.08 * theme.decay)
+  nGain.gain.setValueAtTime(0.15, now)
+  nGain.gain.exponentialRampToValueAtTime(0.001, now + noiseDuration)
 
   noise.connect(filter)
   filter.connect(nGain)
   nGain.connect(dest)
   noise.start(now)
-  noise.stop(now + 0.08 * theme.decay)
+  noise.stop(now + noiseDuration)
 }
