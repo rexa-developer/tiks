@@ -1,4 +1,5 @@
 import type { SoundGenerator } from '../types'
+import { createNoiseSource } from './_util'
 
 export const error: SoundGenerator = (ctx, dest, theme) => {
   const now = ctx.currentTime
@@ -22,13 +23,7 @@ export const error: SoundGenerator = (ctx, dest, theme) => {
 
   // Noise thud through lowpass
   const noiseDuration = Math.max(0.1 * theme.decay, 0.005)
-  const bufSize = Math.max(Math.floor(ctx.sampleRate * noiseDuration), 1)
-  const buf = ctx.createBuffer(1, bufSize, ctx.sampleRate)
-  const data = buf.getChannelData(0)
-  for (let i = 0; i < bufSize; i++) data[i] = Math.random() * 2 - 1
-
-  const noise = ctx.createBufferSource()
-  noise.buffer = buf
+  const noise = createNoiseSource(ctx, theme)
 
   const filter = ctx.createBiquadFilter()
   filter.type = 'lowpass'

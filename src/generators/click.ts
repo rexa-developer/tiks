@@ -1,18 +1,11 @@
 import type { SoundGenerator } from '../types'
+import { createNoiseSource } from './_util'
 
 export const click: SoundGenerator = (ctx, dest, theme) => {
   const now = ctx.currentTime
   const duration = Math.max(0.03 * theme.decay, 0.005)
 
-  const bufferSize = Math.max(Math.floor(ctx.sampleRate * duration), 1)
-  const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate)
-  const data = buffer.getChannelData(0)
-  for (let i = 0; i < bufferSize; i++) {
-    data[i] = Math.random() * 2 - 1
-  }
-
-  const noise = ctx.createBufferSource()
-  noise.buffer = buffer
+  const noise = createNoiseSource(ctx, theme)
 
   const filter = ctx.createBiquadFilter()
   filter.type = 'bandpass'
