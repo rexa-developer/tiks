@@ -9,13 +9,14 @@ export function useTiks(options?: TiksOptions) {
     engineRef.current = new TiksEngine()
   }
 
-  const theme = typeof options?.theme === 'string' ? options.theme : options?.theme?.name
+  const theme = options?.theme
   const volume = options?.volume
   const muted = options?.muted
+  const respectReducedMotion = options?.respectReducedMotion
 
   useEffect(() => {
     engineRef.current!.init(options)
-  }, [theme, volume, muted])
+  }, [theme, volume, muted, respectReducedMotion])
 
   return useMemo(() => {
     const engine = engineRef.current!
