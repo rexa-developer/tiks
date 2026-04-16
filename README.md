@@ -2,8 +2,8 @@
 
 **Procedural UI sounds for the web. Zero audio files. Pure synthesis.**
 
-[![npm](https://img.shields.io/npm/v/tiks)](https://www.npmjs.com/package/tiks)
-[![gzip size](https://img.shields.io/badge/gzip-~2KB-brightgreen)](https://bundlephobia.com/package/tiks)
+[![npm](https://img.shields.io/npm/v/@rexa-developer/tiks)](https://www.npmjs.com/package/@rexa-developer/tiks)
+[![gzip size](https://img.shields.io/badge/gzip-~2KB-brightgreen)](https://bundlephobia.com/package/@rexa-developer/tiks)
 [![license](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
 Every native app has satisfying sounds — iOS toggle clicks, macOS trash crumple, Android keyboard taps. Web apps have nothing. **tiks** brings that missing sensory layer using the Web Audio API. Every sound is generated at runtime through oscillators, noise buffers, and gain envelopes. No audio files shipped. Just math.
@@ -13,13 +13,13 @@ All sounds share a common synthesis engine with a unified theme — so they soun
 ## Install
 
 ```bash
-npm install tiks
+npm install @rexa-developer/tiks
 ```
 
 ## Quick Start
 
 ```ts
-import { tiks } from 'tiks'
+import { tiks } from '@rexa-developer/tiks'
 
 // Initialize (call on first user gesture for browser autoplay policy)
 tiks.init()
@@ -65,7 +65,7 @@ tiks.setTheme('crisp')
 ### Custom Themes
 
 ```ts
-import { tiks, defineTheme } from 'tiks'
+import { tiks, defineTheme } from '@rexa-developer/tiks'
 
 const brand = defineTheme({
   name: 'brand',
@@ -114,7 +114,7 @@ tiks.init({
 ## React
 
 ```tsx
-import { useTiks } from 'tiks/react'
+import { useTiks } from '@rexa-developer/tiks/react'
 
 function ToggleButton() {
   const { click, toggle } = useTiks()
@@ -140,7 +140,7 @@ The hook auto-initializes on mount. All returned methods are stable references.
 For minimal bundles, import only the sounds you need:
 
 ```ts
-import { init, click, success } from 'tiks'
+import { init, click, success } from '@rexa-developer/tiks'
 
 init()
 click()
@@ -151,7 +151,7 @@ success()
 
 ```html
 <script type="module">
-  import { tiks } from 'https://esm.sh/tiks'
+  import { tiks } from 'https://esm.sh/@rexa-developer/tiks'
   document.querySelector('#btn').onclick = () => tiks.click()
 </script>
 ```

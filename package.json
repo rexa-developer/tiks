@@ -1,5 +1,5 @@
 {
-  "name": "tiks",
+  "name": "@rexa-developer/tiks",
   "version": "0.1.0",
   "description": "Procedural UI sounds for the web. Zero audio files. Pure synthesis.",
   "type": "module",
@@ -11,7 +11,8 @@
     },
     "./react": {
       "types": "./dist/react.d.ts",
-      "import": "./dist/react.js"
+      "import": "./dist/react.js",
+      "require": "./dist/react.cjs"
     }
   },
   "main": "./dist/index.cjs",

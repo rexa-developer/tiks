@@ -415,7 +415,7 @@
     <section>
       <h2>Setup</h2>
       <div class="code-block">
-        <span class="kw">import</span> { <span class="fn">tiks</span> } <span class="kw">from</span> <span class="str">'tiks'</span><br><br>
+        <span class="kw">import</span> { <span class="fn">tiks</span> } <span class="kw">from</span> <span class="str">'@rexa-developer/tiks'</span><br><br>
         <span class="cmt">// Initialize on first gesture</span><br>
         <span class="fn">tiks</span>.<span class="fn">init</span>()<br><br>
         <span class="cmt">// Play sounds</span><br>
@@ -429,7 +429,7 @@
     <section>
       <div class="install">
         <span class="dollar">$</span>
-        <span class="cmd">npm install tiks</span>
+        <span class="cmd">npm install @rexa-developer/tiks</span>
         <button class="copy-btn" id="copyBtn">Copy</button>
       </div>
     </section>
@@ -589,7 +589,7 @@
 
     // Copy button
     document.getElementById('copyBtn').addEventListener('click', () => {
-      navigator.clipboard.writeText('npm install tiks')
+      navigator.clipboard.writeText('npm install @rexa-developer/tiks')
       const btn = document.getElementById('copyBtn')
       btn.textContent = 'Copied!'
       tiks.success()
