@@ -34,7 +34,7 @@
 
 ## Last Session
 - Date: 2026-04-16
-- Task: tiks v1 full implementation
+- Task: tiks v1 — full build, publish, deploy
 - Status: Complete
-- Key files: src/index.ts, src/tiks.ts, src/engine.ts, src/themes.ts, src/noise.ts, src/generators/*.ts, src/react.ts, demo/index.html
-- Notes: All 11 tasks complete. 62 tests passing. Bundle: 1.93KB gzipped. On feat/tiks-v1 branch, not yet merged to main. Demo page needs browser testing.
+- Key files: all src/*, demo/index.html, .github/workflows/deploy-demo.yml
+- Notes: Published @rexa-developer/tiks@0.1.0 to npm. Demo deployed to GitHub Pages. Merged to main. All done.
