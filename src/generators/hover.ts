@@ -14,7 +14,7 @@ export const hover: SoundGenerator = (ctx, dest, theme) => {
   const attack = Math.min(0.002, duration * 0.3)
   const gain = ctx.createGain()
   gain.gain.setValueAtTime(0.001, now)
-  gain.gain.linearRampToValueAtTime(0.05, now + attack)
+  gain.gain.linearRampToValueAtTime(0.1, now + attack)
   gain.gain.exponentialRampToValueAtTime(0.001, now + duration)
 
   noise.connect(filter)
