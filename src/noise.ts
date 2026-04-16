@@ -30,7 +30,7 @@ export function getPinkNoise(ctx: AudioContext): AudioBuffer {
   const buffer = ctx.createBuffer(1, length, ctx.sampleRate)
   const data = buffer.getChannelData(0)
 
-  // Voss-McCartney algorithm
+  // Paul Kellet's "PK3" IIR filter (musicdsp, 1999-10-17)
   let b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0
   for (let i = 0; i < length; i++) {
     const white = Math.random() * 2 - 1
