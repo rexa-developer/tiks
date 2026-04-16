@@ -5,7 +5,6 @@ class AudioEngine {
   private masterGain: GainNode | null = null
   private _muted = false
   private _volume = 0.3
-  private _resumePromise: Promise<void> | null = null
 
   init(options?: TiksOptions) {
     // Reuse existing context instead of leaking a new one
@@ -25,9 +24,9 @@ class AudioEngine {
       if (mq.matches) this._muted = true
     }
 
-    // Eagerly resume on init (called from user gesture)
+    // Attempt resume; if called outside a gesture (iOS), playSound will retry
     if (this.ctx.state === 'suspended') {
-      this._resumePromise = this.ctx.resume()
+      this.ctx.resume().catch(() => {})
     }
   }
 
@@ -46,9 +45,6 @@ class AudioEngine {
       this.masterGain.connect(this.ctx.destination)
       this.masterGain.gain.value = this._volume
     }
-    if (this.ctx.state === 'suspended') {
-      this._resumePromise = this.ctx.resume()
-    }
     return this.ctx
   }
 
@@ -57,10 +53,11 @@ class AudioEngine {
     const ctx = this.ensureContext()
     if (!this.masterGain) return
 
-    // If context is resuming, wait for it before playing
-    if (this._resumePromise) {
-      this._resumePromise.then(() => {
-        this._resumePromise = null
+    // iOS Safari: resume() called outside a user gesture is a silent no-op.
+    // The current call is (usually) inside a gesture handler, so re-attempt
+    // resume whenever the context is still suspended.
+    if (ctx.state === 'suspended') {
+      ctx.resume().then(() => {
         generator(ctx, this.masterGain!, theme)
       })
     } else {
