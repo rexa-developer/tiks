@@ -5,11 +5,11 @@ export const toggleOn: SoundGenerator = (ctx, dest, theme) => {
   const now = ctx.currentTime
   const duration = Math.max(0.06 * theme.decay, 0.005)
 
-  // Rising sine
+  // Rising sine: 0.8x → 1.2x
   const osc = ctx.createOscillator()
   osc.type = theme.oscType
-  osc.frequency.setValueAtTime(theme.baseFreq, now)
-  osc.frequency.exponentialRampToValueAtTime(theme.baseFreq * 1.5, now + duration)
+  osc.frequency.setValueAtTime(theme.baseFreq * 0.8, now)
+  osc.frequency.exponentialRampToValueAtTime(theme.baseFreq * 1.2, now + duration)
 
   const gain = ctx.createGain()
   gain.gain.setValueAtTime(0.001, now)
@@ -40,11 +40,11 @@ export const toggleOff: SoundGenerator = (ctx, dest, theme) => {
   const now = ctx.currentTime
   const duration = Math.max(0.06 * theme.decay, 0.005)
 
-  // Falling sine
+  // Falling sine: 1.0x → 0.6x (ends below toggleOn's 1.2x peak)
   const osc = ctx.createOscillator()
   osc.type = theme.oscType
-  osc.frequency.setValueAtTime(theme.baseFreq * 1.2, now)
-  osc.frequency.exponentialRampToValueAtTime(theme.baseFreq * 0.7, now + duration)
+  osc.frequency.setValueAtTime(theme.baseFreq, now)
+  osc.frequency.exponentialRampToValueAtTime(theme.baseFreq * 0.6, now + duration)
 
   const gain = ctx.createGain()
   gain.gain.setValueAtTime(0.001, now)

@@ -5,7 +5,7 @@ export const success: SoundGenerator = (ctx, dest, theme) => {
   const scale = theme.baseFreq / 440
   const attack = theme.attack
 
-  // First note: C5 (523Hz scaled)
+  // First note: tonic (523Hz × scale)
   const dur1 = Math.max(0.1 * theme.decay, 0.005)
   const osc1 = ctx.createOscillator()
   osc1.type = theme.oscType
@@ -21,7 +21,7 @@ export const success: SoundGenerator = (ctx, dest, theme) => {
   osc1.start(now)
   osc1.stop(now + dur1)
 
-  // Second note: G5 (784Hz scaled), delayed
+  // Second note: fifth above tonic (784Hz × scale), delayed
   const delay = Math.max(0.08 * theme.decay, 0.005)
   const dur2 = Math.max(0.15 * theme.decay, 0.005)
   const osc2 = ctx.createOscillator()
