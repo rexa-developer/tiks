@@ -5,6 +5,7 @@ class AudioEngine {
   private masterGain: GainNode | null = null
   private _muted = false
   private _volume = 0.3
+  private _lifecycleBound = false
 
   init(options?: TiksOptions) {
     // Reuse existing context instead of leaking a new one
@@ -24,10 +25,29 @@ class AudioEngine {
       if (mq.matches) this._muted = true
     }
 
+    this.bindLifecycle()
+
     // Attempt resume; if called outside a gesture (iOS), playSound will retry
     if (this.ctx.state === 'suspended') {
       this.ctx.resume().catch(() => {})
     }
+  }
+
+  // Browsers suspend AudioContexts on tab-away and on bfcache store.
+  // On restore (pageshow.persisted or visibilitychange→visible), resume.
+  private bindLifecycle() {
+    if (this._lifecycleBound) return
+    if (typeof window === 'undefined' || typeof document === 'undefined') return
+    this._lifecycleBound = true
+
+    const resume = () => {
+      const c = this.ctx
+      if (c && c.state === 'suspended') c.resume().catch(() => {})
+    }
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') resume()
+    })
+    window.addEventListener('pageshow', resume)
   }
 
   getContext(): AudioContext | null {
@@ -55,11 +75,12 @@ class AudioEngine {
 
     // iOS Safari: resume() called outside a user gesture is a silent no-op.
     // The current call is (usually) inside a gesture handler, so re-attempt
-    // resume whenever the context is still suspended.
+    // resume whenever the context is still suspended. Play regardless — on
+    // bfcache restore resume() can reject, but starting nodes inside a gesture
+    // often wakes the context anyway.
     if (ctx.state === 'suspended') {
-      ctx.resume().then(() => {
-        generator(ctx, this.masterGain!, theme)
-      })
+      const play = () => generator(ctx, this.masterGain!, theme)
+      ctx.resume().then(play, play)
     } else {
       generator(ctx, this.masterGain, theme)
     }

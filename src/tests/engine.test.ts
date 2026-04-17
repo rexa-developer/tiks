@@ -77,4 +77,37 @@ describe('AudioEngine', () => {
     expect(audioEngine.isMuted()).toBe(true)
     audioEngine.unmute()
   })
+
+  it('resumes suspended context on pageshow (bfcache restore)', () => {
+    audioEngine.init()
+    const ctx = audioEngine.getContext() as unknown as { state: AudioContextState; resume: ReturnType<typeof vi.fn> }
+    ctx.resume.mockClear()
+    ctx.state = 'suspended'
+
+    window.dispatchEvent(new Event('pageshow'))
+    expect(ctx.resume).toHaveBeenCalled()
+
+    ctx.state = 'running'
+  })
+
+  it('plays sound even if resume() rejects', async () => {
+    audioEngine.init()
+    audioEngine.unmute()
+    const ctx = audioEngine.getContext() as unknown as { state: AudioContextState; resume: ReturnType<typeof vi.fn> }
+    ctx.state = 'suspended'
+    ctx.resume.mockImplementationOnce(() => Promise.reject(new Error('no gesture')))
+
+    const generator = vi.fn()
+    const theme = {
+      name: 'test', baseFreq: 440, noiseColor: 'white' as const,
+      oscType: 'sine' as const, filterFreq: 3000, filterQ: 0.7,
+      attack: 0.002, decay: 1.0, brightness: 200,
+    }
+    audioEngine.playSound(generator, theme)
+    await Promise.resolve()
+    await Promise.resolve()
+    expect(generator).toHaveBeenCalledOnce()
+
+    ctx.state = 'running'
+  })
 })
