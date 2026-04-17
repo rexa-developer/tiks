@@ -1,6 +1,6 @@
 {
   "name": "@rexa-developer/tiks",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "Procedural UI sounds for the web. Zero audio files. Pure synthesis.",
   "homepage": "https://rexa-developer.github.io/tiks",
   "repository": {
