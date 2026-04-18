@@ -1,8 +1,8 @@
 import type { SoundGenerator } from '../types'
-import { createNoiseSource } from './_util'
+import { createNoiseSource, startTime } from './_util'
 
 export const toggleOn: SoundGenerator = (ctx, dest, theme) => {
-  const now = ctx.currentTime
+  const now = startTime(ctx)
   const duration = Math.max(0.06 * theme.decay, 0.005)
 
   // Rising sine: 0.8x → 1.2x
@@ -37,7 +37,7 @@ export const toggleOn: SoundGenerator = (ctx, dest, theme) => {
 }
 
 export const toggleOff: SoundGenerator = (ctx, dest, theme) => {
-  const now = ctx.currentTime
+  const now = startTime(ctx)
   const duration = Math.max(0.06 * theme.decay, 0.005)
 
   // Falling sine: 1.0x → 0.6x (ends below toggleOn's 1.2x peak)

@@ -1,7 +1,8 @@
 import type { SoundGenerator } from '../types'
+import { startTime } from './_util'
 
 export const pop: SoundGenerator = (ctx, dest, theme) => {
-  const now = ctx.currentTime
+  const now = startTime(ctx)
   const duration = Math.max(0.08 * theme.decay, 0.005)
   const scale = theme.baseFreq / 440
 

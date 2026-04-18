@@ -1,6 +1,12 @@
 import { describe, it, expect, vi } from 'vitest'
 import { audioEngine } from '../engine'
 
+const testTheme = {
+  name: 'test', baseFreq: 440, noiseColor: 'white' as const,
+  oscType: 'sine' as const, filterFreq: 3000, filterQ: 0.7,
+  attack: 0.002, decay: 1.0, brightness: 200,
+}
+
 describe('AudioEngine', () => {
   it('creates AudioContext and GainNode on init', () => {
     audioEngine.init()
@@ -15,7 +21,6 @@ describe('AudioEngine', () => {
   it('sets custom volume from options', () => {
     audioEngine.init({ volume: 0.7 })
     expect(audioEngine.getMasterGain()!.gain.value).toBeCloseTo(0.7)
-    // Reset
     audioEngine.setVolume(0.3)
   })
 
@@ -41,13 +46,7 @@ describe('AudioEngine', () => {
     audioEngine.mute()
 
     const generator = vi.fn()
-    const theme = {
-      name: 'test', baseFreq: 440, noiseColor: 'white' as const,
-      oscType: 'sine' as const, filterFreq: 3000, filterQ: 0.7,
-      attack: 0.002, decay: 1.0, brightness: 200,
-    }
-
-    audioEngine.playSound(generator, theme)
+    audioEngine.playSound(generator, testTheme)
     expect(generator).not.toHaveBeenCalled()
     audioEngine.unmute()
   })
@@ -57,18 +56,12 @@ describe('AudioEngine', () => {
     audioEngine.unmute()
 
     const generator = vi.fn()
-    const theme = {
-      name: 'test', baseFreq: 440, noiseColor: 'white' as const,
-      oscType: 'sine' as const, filterFreq: 3000, filterQ: 0.7,
-      attack: 0.002, decay: 1.0, brightness: 200,
-    }
-
-    audioEngine.playSound(generator, theme)
+    audioEngine.playSound(generator, testTheme)
     expect(generator).toHaveBeenCalledOnce()
     expect(generator).toHaveBeenCalledWith(
       audioEngine.getContext(),
       audioEngine.getMasterGain(),
-      theme,
+      testTheme,
     )
   })
 
@@ -90,7 +83,7 @@ describe('AudioEngine', () => {
     ctx.state = 'running'
   })
 
-  it('plays sound even if resume() rejects', async () => {
+  it('does not call generator when context is still suspended', () => {
     audioEngine.init()
     audioEngine.unmute()
     const ctx = audioEngine.getContext() as unknown as { state: AudioContextState; resume: ReturnType<typeof vi.fn> }
@@ -98,16 +91,47 @@ describe('AudioEngine', () => {
     ctx.resume.mockImplementationOnce(() => Promise.reject(new Error('no gesture')))
 
     const generator = vi.fn()
-    const theme = {
-      name: 'test', baseFreq: 440, noiseColor: 'white' as const,
-      oscType: 'sine' as const, filterFreq: 3000, filterQ: 0.7,
-      attack: 0.002, decay: 1.0, brightness: 200,
-    }
-    audioEngine.playSound(generator, theme)
-    await Promise.resolve()
-    await Promise.resolve()
-    expect(generator).toHaveBeenCalledOnce()
+    audioEngine.playSound(generator, testTheme)
+    expect(generator).not.toHaveBeenCalled()
 
     ctx.state = 'running'
+  })
+
+  it('gesture unlock: dispatches silent buffer on pointerdown and resumes ctx', () => {
+    audioEngine.init()
+    const ctx = audioEngine.getContext() as unknown as {
+      state: AudioContextState
+      resume: ReturnType<typeof vi.fn>
+      createBuffer: ReturnType<typeof vi.fn>
+      createBufferSource: ReturnType<typeof vi.fn>
+    }
+    ctx.state = 'suspended'
+    ctx.resume.mockClear()
+    const createBufferSpy = vi.spyOn(ctx, 'createBuffer')
+    const createSourceSpy = vi.spyOn(ctx, 'createBufferSource')
+
+    document.dispatchEvent(new Event('pointerdown'))
+
+    expect(ctx.resume).toHaveBeenCalled()
+    expect(createBufferSpy).toHaveBeenCalledWith(1, 1, 22050)
+    expect(createSourceSpy).toHaveBeenCalled()
+    const src = createSourceSpy.mock.results[0]?.value as { start: ReturnType<typeof vi.fn> }
+    expect(src.start).toHaveBeenCalled()
+
+    ctx.state = 'running'
+  })
+
+  it('gesture unlock: unbinds listener once ctx is running', () => {
+    audioEngine.init()
+    const ctx = audioEngine.getContext() as unknown as {
+      state: AudioContextState
+      resume: ReturnType<typeof vi.fn>
+    }
+    ctx.state = 'running'
+
+    document.dispatchEvent(new Event('pointerdown'))
+    ctx.resume.mockClear()
+    document.dispatchEvent(new Event('pointerdown'))
+    expect(ctx.resume).not.toHaveBeenCalled()
   })
 })

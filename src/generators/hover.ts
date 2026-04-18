@@ -1,8 +1,8 @@
 import type { SoundGenerator } from '../types'
-import { createNoiseSource } from './_util'
+import { createNoiseSource, startTime } from './_util'
 
 export const hover: SoundGenerator = (ctx, dest, theme) => {
-  const now = ctx.currentTime
+  const now = startTime(ctx)
   const duration = Math.max(0.015 * theme.decay, 0.005)
 
   const noise = createNoiseSource(ctx, theme)

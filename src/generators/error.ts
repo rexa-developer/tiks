@@ -1,8 +1,8 @@
 import type { SoundGenerator } from '../types'
-import { createNoiseSource } from './_util'
+import { createNoiseSource, startTime } from './_util'
 
 export const error: SoundGenerator = (ctx, dest, theme) => {
-  const now = ctx.currentTime
+  const now = startTime(ctx)
   const duration = Math.max(0.15 * theme.decay, 0.005)
 
   // Low buzz with pitch drop for "thud" feel

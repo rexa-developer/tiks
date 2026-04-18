@@ -1,7 +1,8 @@
 import type { SoundGenerator } from '../types'
+import { startTime } from './_util'
 
 export const notify: SoundGenerator = (ctx, dest, theme) => {
-  const now = ctx.currentTime
+  const now = startTime(ctx)
   const dur1 = Math.max(0.18 * theme.decay, 0.005)
   const dur2 = Math.max(0.3 * theme.decay, 0.005)
   const delay = Math.max(0.1 * theme.decay, 0.02)
