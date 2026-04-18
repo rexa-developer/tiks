@@ -141,16 +141,21 @@ The hook auto-initializes on mount. All returned methods are stable references.
 
 ```vue
 <script setup lang="ts">
+import { ref } from 'vue'
 import { useTiks } from '@rexa-developer/tiks/vue'
 
-const { click, success, toggle } = useTiks()
-let enabled = $ref(false)
+const { click, toggle } = useTiks()
+const enabled = ref(false)
+
+function onClick() {
+  click()
+  enabled.value = !enabled.value
+  toggle(enabled.value)
+}
 </script>
 
 <template>
-  <button @click="() => { click(); toggle(enabled = !enabled) }">
-    Toggle
-  </button>
+  <button @click="onClick">Toggle</button>
 </template>
 ```
 
