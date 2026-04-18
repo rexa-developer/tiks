@@ -137,6 +137,25 @@ The hook auto-initializes on mount. All returned methods are stable references.
 
 > **Note:** `volume` and `muted` are shared globally across all `useTiks` hooks (they live on the underlying audio engine). `theme` is per-hook. If two hooks pass different `volume` values, the last-mounted one wins.
 
+## Vue
+
+```vue
+<script setup lang="ts">
+import { useTiks } from '@rexa-developer/tiks/vue'
+
+const { click, success, toggle } = useTiks()
+let enabled = $ref(false)
+</script>
+
+<template>
+  <button @click="() => { click(); toggle(enabled = !enabled) }">
+    Toggle
+  </button>
+</template>
+```
+
+The composable auto-initializes on component mount. Same global/per-instance semantics as the React hook: `volume` and `muted` are shared across all `useTiks` calls, `theme` is per-composable.
+
 ## Tree-Shakeable Imports
 
 For minimal bundles, import only the sounds you need:
@@ -189,6 +208,7 @@ No audio files. No downloads. No decoding. Just oscillators and math.
 |-------|---------|
 | Core (`tiks`) | ~2KB |
 | React hook (`tiks/react`) | ~300B |
+| Vue composable (`tiks/vue`) | ~300B |
 
 ## License
 
