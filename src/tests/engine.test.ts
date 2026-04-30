@@ -8,18 +8,22 @@ const testTheme = {
 }
 
 describe('AudioEngine', () => {
-  it('creates AudioContext and GainNode on init', () => {
+  it('init does not create AudioContext until first user gesture', () => {
     audioEngine.init()
-    expect(audioEngine.getContext()).toBeTruthy()
-    expect(audioEngine.getMasterGain()).toBeTruthy()
+    expect(audioEngine.getContext()).toBeNull()
+    expect(audioEngine.getMasterGain()).toBeNull()
   })
 
   it('sets default volume to 0.3', () => {
     expect(audioEngine.getVolume()).toBe(0.3)
   })
 
-  it('sets custom volume from options', () => {
+  it('applies init volume to gain node once context exists', () => {
     audioEngine.init({ volume: 0.7 })
+    // Force creation without dispatching a real gesture, so the gesture-unlock
+    // listener stays bound for the dedicated tests below.
+    ;(audioEngine as unknown as { createContext: () => AudioContext }).createContext()
+    expect(audioEngine.getContext()).toBeTruthy()
     expect(audioEngine.getMasterGain()!.gain.value).toBeCloseTo(0.7)
     audioEngine.setVolume(0.3)
   })
