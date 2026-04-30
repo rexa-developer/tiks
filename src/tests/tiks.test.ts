@@ -3,8 +3,10 @@ import { tiks } from '../tiks'
 import { audioEngine } from '../engine'
 
 describe('TiksEngine', () => {
-  it('init creates audio context', () => {
+  it('init followed by a user gesture creates audio context', () => {
     tiks.init()
+    expect(audioEngine.getContext()).toBeNull()
+    document.dispatchEvent(new Event('pointerdown'))
     expect(audioEngine.getContext()).toBeTruthy()
   })
 

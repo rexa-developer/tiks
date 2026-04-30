@@ -19,14 +19,8 @@ class AudioEngine {
   init(options?: TiksOptions) {
     if (!AudioCtxCtor) return
 
-    if (!this.ctx || this.ctx.state === 'closed') {
-      this.ctx = new AudioCtxCtor()
-      this.masterGain = this.ctx.createGain()
-      this.masterGain.connect(this.ctx.destination)
-    }
-
     if (options?.volume !== undefined) this._volume = Math.max(0, Math.min(1, options.volume))
-    this.masterGain!.gain.value = this._volume
+    if (this.masterGain) this.masterGain.gain.value = this._volume
 
     if (options?.muted) this._muted = true
 
@@ -37,10 +31,16 @@ class AudioEngine {
 
     this.bindLifecycle()
     this.bindGestureUnlock()
+  }
 
-    if (this.ctx.state === 'suspended') {
-      this.ctx.resume().catch(() => {})
-    }
+  private createContext(): AudioContext | null {
+    if (!AudioCtxCtor) return null
+    if (this.ctx && this.ctx.state !== 'closed') return this.ctx
+    this.ctx = new AudioCtxCtor()
+    this.masterGain = this.ctx.createGain()
+    this.masterGain.connect(this.ctx.destination)
+    this.masterGain.gain.value = this._volume
+    return this.ctx
   }
 
   private bindLifecycle() {
@@ -58,9 +58,11 @@ class AudioEngine {
     window.addEventListener('pageshow', resume)
   }
 
-  // iOS Safari keeps AudioContexts locked until a node is actually started
-  // inside a user gesture. Attach one listener that fires a silent 1-sample
-  // buffer on the next gesture and unbinds itself once ctx.state === 'running'.
+  // Construct the AudioContext lazily on the first qualifying user gesture.
+  // Creating it eagerly (e.g. inside init() during page load) trips Chrome's
+  // "AudioContext was not allowed to start" warning and leaves the context
+  // suspended until a gesture arrives. By deferring construction, the context
+  // is born in 'running' state and the very next pointerenter / hover plays.
   private bindGestureUnlock() {
     if (this._unlockBound) return
     if (typeof document === 'undefined') return
@@ -68,16 +70,17 @@ class AudioEngine {
 
     let unlocking = false
     const unlock = () => {
-      const c = this.ctx
-      if (!c) return
       if (unlocking) return
       unlocking = true
+      const c = this.createContext()
+      if (!c) return
       if (c.state === 'suspended') {
         c.resume().then(
           () => { if (c.state === 'running') this._unlockTeardown?.() },
           () => { unlocking = false },
         )
       }
+      // iOS Safari additionally needs a node started inside the gesture.
       try {
         const src = c.createBufferSource()
         src.buffer = c.createBuffer(1, 1, 22050)
@@ -107,28 +110,17 @@ class AudioEngine {
     return this.masterGain
   }
 
-  private ensureContext(): AudioContext | null {
-    if (!AudioCtxCtor) return null
-    if (!this.ctx || this.ctx.state === 'closed') {
-      this.ctx = new AudioCtxCtor()
-      this.masterGain = this.ctx.createGain()
-      this.masterGain.connect(this.ctx.destination)
-      this.masterGain.gain.value = this._volume
-    }
-    return this.ctx
-  }
-
   playSound(generator: SoundGenerator, theme: TiksTheme) {
     if (this._muted) return
-    const ctx = this.ensureContext()
+    // No context yet means no gesture has happened. Bail silently — a hover
+    // sound triggered before any user interaction can't play under autoplay
+    // policy anyway, and constructing a context here would re-introduce the
+    // "AudioContext was not allowed to start" warning.
+    const ctx = this.ctx
     if (!ctx || !this.masterGain) return
 
     if (ctx.state === 'suspended') {
       ctx.resume().catch(() => {})
-      // On Safari, starting nodes on a suspended context is silent. Bail
-      // instead of faking playback — the gesture unlock handler is already
-      // installed and will flip the context to 'running' for the next call.
-      // (On Chrome, resume() can flip state synchronously; re-read to check.)
       if ((ctx.state as AudioContextState) !== 'running') return
     }
 

@@ -21,7 +21,8 @@ npm install @rexa-developer/tiks
 ```ts
 import { tiks } from '@rexa-developer/tiks'
 
-// Initialize (call on first user gesture for browser autoplay policy)
+// Initialize (safe to call at any time — the AudioContext is created on the
+// first real user gesture, so this never triggers an autoplay-policy warning)
 tiks.init()
 
 // Play sounds
