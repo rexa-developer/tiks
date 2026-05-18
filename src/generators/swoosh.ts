@@ -16,7 +16,7 @@ export const swoosh: SoundGenerator = (ctx, dest, theme) => {
   const attack = Math.min(theme.attack * 2, duration * 0.1)
   const gain = ctx.createGain()
   gain.gain.setValueAtTime(0.001, now)
-  gain.gain.linearRampToValueAtTime(0.2, now + attack)
+  gain.gain.linearRampToValueAtTime(0.6, now + attack)
   gain.gain.exponentialRampToValueAtTime(0.001, now + duration)
 
   noise.connect(filter)

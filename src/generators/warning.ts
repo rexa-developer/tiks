@@ -17,7 +17,7 @@ export const warning: SoundGenerator = (ctx, dest, theme) => {
     const attack = Math.min(theme.attack, noteDuration * 0.5)
     const gain = ctx.createGain()
     gain.gain.setValueAtTime(0.001, t)
-    gain.gain.linearRampToValueAtTime(0.25, t + attack)
+    gain.gain.linearRampToValueAtTime(0.75, t + attack)
     gain.gain.exponentialRampToValueAtTime(0.001, t + noteDuration)
 
     osc.connect(gain)

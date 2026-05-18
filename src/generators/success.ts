@@ -14,7 +14,7 @@ export const success: SoundGenerator = (ctx, dest, theme) => {
 
   const gain1 = ctx.createGain()
   gain1.gain.setValueAtTime(0.001, now)
-  gain1.gain.linearRampToValueAtTime(0.25, now + attack)
+  gain1.gain.linearRampToValueAtTime(0.75, now + attack)
   gain1.gain.exponentialRampToValueAtTime(0.001, now + dur1)
 
   osc1.connect(gain1)
@@ -31,7 +31,7 @@ export const success: SoundGenerator = (ctx, dest, theme) => {
 
   const gain2 = ctx.createGain()
   gain2.gain.setValueAtTime(0.001, now + delay)
-  gain2.gain.linearRampToValueAtTime(0.25, now + delay + attack)
+  gain2.gain.linearRampToValueAtTime(0.75, now + delay + attack)
   gain2.gain.exponentialRampToValueAtTime(0.001, now + delay + dur2)
 
   osc2.connect(gain2)

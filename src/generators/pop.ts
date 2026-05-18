@@ -14,7 +14,7 @@ export const pop: SoundGenerator = (ctx, dest, theme) => {
   const attack = Math.min(theme.attack, duration * 0.2)
   const gain = ctx.createGain()
   gain.gain.setValueAtTime(0.001, now)
-  gain.gain.linearRampToValueAtTime(0.3, now + attack)
+  gain.gain.linearRampToValueAtTime(0.9, now + attack)
   gain.gain.exponentialRampToValueAtTime(0.001, now + duration)
 
   osc.connect(gain)

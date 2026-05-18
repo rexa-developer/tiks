@@ -13,7 +13,7 @@ export const toggleOn: SoundGenerator = (ctx, dest, theme) => {
 
   const gain = ctx.createGain()
   gain.gain.setValueAtTime(0.001, now)
-  gain.gain.linearRampToValueAtTime(0.25, now + theme.attack)
+  gain.gain.linearRampToValueAtTime(0.75, now + theme.attack)
   gain.gain.exponentialRampToValueAtTime(0.001, now + duration)
 
   osc.connect(gain)
@@ -27,7 +27,7 @@ export const toggleOn: SoundGenerator = (ctx, dest, theme) => {
   const noise = createNoiseSource(ctx, theme)
 
   const nGain = ctx.createGain()
-  nGain.gain.setValueAtTime(0.08, now)
+  nGain.gain.setValueAtTime(0.24, now)
   nGain.gain.exponentialRampToValueAtTime(0.001, now + noiseDuration)
 
   noise.connect(nGain)
@@ -48,7 +48,7 @@ export const toggleOff: SoundGenerator = (ctx, dest, theme) => {
 
   const gain = ctx.createGain()
   gain.gain.setValueAtTime(0.001, now)
-  gain.gain.linearRampToValueAtTime(0.25, now + theme.attack)
+  gain.gain.linearRampToValueAtTime(0.75, now + theme.attack)
   gain.gain.exponentialRampToValueAtTime(0.001, now + duration)
 
   osc.connect(gain)
@@ -62,7 +62,7 @@ export const toggleOff: SoundGenerator = (ctx, dest, theme) => {
   const noise = createNoiseSource(ctx, theme)
 
   const nGain = ctx.createGain()
-  nGain.gain.setValueAtTime(0.08, now)
+  nGain.gain.setValueAtTime(0.24, now)
   nGain.gain.exponentialRampToValueAtTime(0.001, now + noiseDuration)
 
   noise.connect(nGain)

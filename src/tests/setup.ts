@@ -32,6 +32,16 @@ class MockAudioBufferSourceNode {
   stop = vi.fn()
 }
 
+class MockDynamicsCompressorNode {
+  threshold = { value: -24 }
+  knee = { value: 30 }
+  ratio = { value: 12 }
+  attack = { value: 0.003 }
+  release = { value: 0.25 }
+  connect = vi.fn(() => this)
+  disconnect = vi.fn()
+}
+
 class MockAudioBuffer {
   private channels: Float32Array[]
   readonly length: number
@@ -75,6 +85,10 @@ class MockAudioContext {
 
   createBufferSource() {
     return new MockAudioBufferSourceNode() as unknown as AudioBufferSourceNode
+  }
+
+  createDynamicsCompressor() {
+    return new MockDynamicsCompressorNode() as unknown as DynamicsCompressorNode
   }
 
   createBuffer(channels: number, length: number, sampleRate: number) {

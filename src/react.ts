@@ -10,13 +10,16 @@ export function useTiks(options?: TiksOptions) {
   }
 
   const theme = options?.theme
+  // A custom-theme object gets a new identity every render; key off its name
+  // so init() doesn't re-run on every render.
+  const themeKey = typeof theme === 'string' ? theme : theme?.name
   const volume = options?.volume
   const muted = options?.muted
   const respectReducedMotion = options?.respectReducedMotion
 
   useEffect(() => {
     engineRef.current!.init(options)
-  }, [theme, volume, muted, respectReducedMotion])
+  }, [themeKey, volume, muted, respectReducedMotion])
 
   return useMemo(() => {
     const engine = engineRef.current!

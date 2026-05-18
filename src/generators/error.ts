@@ -13,7 +13,7 @@ export const error: SoundGenerator = (ctx, dest, theme) => {
 
   const gain = ctx.createGain()
   gain.gain.setValueAtTime(0.001, now)
-  gain.gain.linearRampToValueAtTime(0.25, now + theme.attack)
+  gain.gain.linearRampToValueAtTime(0.75, now + theme.attack)
   gain.gain.exponentialRampToValueAtTime(0.001, now + duration)
 
   osc.connect(gain)
@@ -30,7 +30,7 @@ export const error: SoundGenerator = (ctx, dest, theme) => {
   filter.frequency.value = 600
 
   const nGain = ctx.createGain()
-  nGain.gain.setValueAtTime(0.15, now)
+  nGain.gain.setValueAtTime(0.45, now)
   nGain.gain.exponentialRampToValueAtTime(0.001, now + noiseDuration)
 
   noise.connect(filter)

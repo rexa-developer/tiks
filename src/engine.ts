@@ -10,10 +10,13 @@ const GESTURE_EVENTS = ['pointerdown', 'touchstart', 'mousedown', 'keydown'] as 
 class AudioEngine {
   private ctx: AudioContext | null = null
   private masterGain: GainNode | null = null
+  private limiter: DynamicsCompressorNode | null = null
   private _muted = false
+  private _reducedMotionMuted = false
   private _volume = 0.3
   private _lifecycleBound = false
   private _unlockBound = false
+  private _reducedMotionBound = false
   private _unlockTeardown: (() => void) | null = null
 
   init(options?: TiksOptions) {
@@ -24,11 +27,7 @@ class AudioEngine {
 
     if (options?.muted) this._muted = true
 
-    if (options?.respectReducedMotion) {
-      const mq = window.matchMedia('(prefers-reduced-motion: reduce)')
-      if (mq.matches) this._muted = true
-    }
-
+    this.bindReducedMotion(options?.respectReducedMotion)
     this.bindLifecycle()
     this.bindGestureUnlock()
   }
@@ -38,9 +37,36 @@ class AudioEngine {
     if (this.ctx && this.ctx.state !== 'closed') return this.ctx
     this.ctx = new AudioCtxCtor()
     this.masterGain = this.ctx.createGain()
-    this.masterGain.connect(this.ctx.destination)
     this.masterGain.gain.value = this._volume
+
+    // Transparent safety limiter: prevents hard clipping when many short
+    // sounds overlap during rapid interaction. Single sounds peak well below
+    // the -3 dB threshold, so it stays inactive during normal use.
+    this.limiter = this.ctx.createDynamicsCompressor()
+    this.limiter.threshold.value = -3
+    this.limiter.knee.value = 0
+    this.limiter.ratio.value = 20
+    this.limiter.attack.value = 0.003
+    this.limiter.release.value = 0.1
+
+    this.masterGain.connect(this.limiter)
+    this.limiter.connect(this.ctx.destination)
     return this.ctx
+  }
+
+  // prefers-reduced-motion is respected by default. Tracked separately from
+  // explicit mute() so an OS-level preference change can't be silently
+  // overridden, and unmute() never re-enables sound the user asked to suppress.
+  private bindReducedMotion(enabled?: boolean) {
+    if (enabled === false) return
+    if (this._reducedMotionBound) return
+    if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return
+    this._reducedMotionBound = true
+
+    const mq = window.matchMedia('(prefers-reduced-motion: reduce)')
+    const apply = () => { this._reducedMotionMuted = mq.matches }
+    apply()
+    mq.addEventListener('change', apply)
   }
 
   private bindLifecycle() {
@@ -111,20 +137,27 @@ class AudioEngine {
   }
 
   playSound(generator: SoundGenerator, theme: TiksTheme) {
-    if (this._muted) return
+    if (this._muted || this._reducedMotionMuted) return
     // No context yet means no gesture has happened. Bail silently — a hover
     // sound triggered before any user interaction can't play under autoplay
     // policy anyway, and constructing a context here would re-introduce the
     // "AudioContext was not allowed to start" warning.
     const ctx = this.ctx
-    if (!ctx || !this.masterGain) return
+    const master = this.masterGain
+    if (!ctx || !master) return
 
+    // resume() is async; checking ctx.state synchronously right after would
+    // always read 'suspended' and drop the sound (e.g. the first sound after a
+    // tab-visibility restore). Schedule it once resume resolves instead.
     if (ctx.state === 'suspended') {
-      ctx.resume().catch(() => {})
-      if ((ctx.state as AudioContextState) !== 'running') return
+      ctx.resume().then(
+        () => { if (ctx.state === 'running') generator(ctx, master, theme) },
+        () => {},
+      )
+      return
     }
 
-    generator(ctx, this.masterGain, theme)
+    generator(ctx, master, theme)
   }
 
   mute() {
@@ -136,7 +169,7 @@ class AudioEngine {
   }
 
   isMuted(): boolean {
-    return this._muted
+    return this._muted || this._reducedMotionMuted
   }
 
   setVolume(v: number) {

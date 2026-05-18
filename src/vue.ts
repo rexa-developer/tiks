@@ -1,4 +1,4 @@
-import { shallowRef, watchEffect } from 'vue'
+import { shallowRef } from 'vue'
 import { TiksEngine } from './tiks'
 import type { TiksOptions, TiksTheme, ThemeName } from './types'
 
@@ -9,9 +9,8 @@ export function useTiks(options?: TiksOptions) {
     engine.value = new TiksEngine()
   }
 
-  watchEffect(() => {
-    engine.value!.init(options)
-  })
+  // options is a plain (non-reactive) argument, so init once on mount.
+  engine.value!.init(options)
 
   return {
     click: () => engine.value!.click(),

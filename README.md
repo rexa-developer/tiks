@@ -37,7 +37,7 @@ That's it. Three lines.
 
 | Method | Character | Duration |
 |--------|-----------|----------|
-| `click()` | Short, crisp tap | ~30ms |
+| `click()` | Short, crisp tap | ~12ms |
 | `toggle(true)` | Rising pitch snap | ~60ms |
 | `toggle(false)` | Falling pitch snap | ~60ms |
 | `success()` | Two-note rising chime | ~200ms |
@@ -47,6 +47,11 @@ That's it. Three lines.
 | `pop()` | Playful bubble pop | ~80ms |
 | `swoosh()` | Quick transition whoosh | ~120ms |
 | `notify()` | Bright attention ping | ~300ms |
+
+> **`hover()` is a high-frequency primitive — use sparingly.** Hover fires
+> constantly as the pointer moves, and audio on every hover causes fatigue.
+> Reserve it for deliberate, low-density targets (and debounce it); never bind
+> it to dense lists, menus, or whole-page hover regions.
 
 ## Themes
 
@@ -108,7 +113,7 @@ tiks.init({
   theme: 'soft',              // 'soft' | 'crisp' | custom theme
   volume: 0.4,                // 0.0 - 1.0
   muted: false,               // Start muted
-  respectReducedMotion: true,  // Auto-mute if prefers-reduced-motion
+  respectReducedMotion: true,  // Default: true. Set false to always play.
 })
 ```
 
@@ -177,7 +182,7 @@ success()
 
 ## Accessibility
 
-- **`prefers-reduced-motion`**: Pass `respectReducedMotion: true` to auto-mute
+- **`prefers-reduced-motion`**: Respected by default — auto-mutes and reacts to runtime preference changes. Pass `respectReducedMotion: false` to opt out.
 - **Sounds are additive**: Never the only way to convey information — always pair with visual feedback
 - **Global mute**: `tiks.mute()` for user control
 - **Default volume is 30%**: Subtle, not intrusive
@@ -192,11 +197,14 @@ Each sound is a pure function that creates Web Audio nodes, connects them, sched
 
 ```
 OscillatorNode ──┐
-                 ├──→ GainNode (envelope) ──→ MasterGain ──→ speakers
+                 ├──→ GainNode (envelope) ──→ MasterGain ──→ Limiter ──→ speakers
 NoiseBuffer ─────┘
     ↓
 FilterNode ───────────────────────────────┘
 ```
+
+A transparent limiter sits on the master bus so overlapping sounds during
+rapid interaction can't hard-clip; it stays inactive at normal levels.
 
 No audio files. No downloads. No decoding. Just oscillators and math.
 

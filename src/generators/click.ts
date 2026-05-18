@@ -3,7 +3,7 @@ import { createNoiseSource, startTime } from './_util'
 
 export const click: SoundGenerator = (ctx, dest, theme) => {
   const now = startTime(ctx)
-  const duration = Math.max(0.03 * theme.decay, 0.005)
+  const duration = Math.max(0.013 * theme.decay, 0.005)
 
   const noise = createNoiseSource(ctx, theme)
 
@@ -14,7 +14,7 @@ export const click: SoundGenerator = (ctx, dest, theme) => {
 
   const gain = ctx.createGain()
   gain.gain.setValueAtTime(0.001, now)
-  gain.gain.linearRampToValueAtTime(0.3, now + Math.min(theme.attack, duration * 0.5))
+  gain.gain.linearRampToValueAtTime(0.9, now + Math.min(theme.attack, duration * 0.5))
   gain.gain.exponentialRampToValueAtTime(0.001, now + duration)
 
   noise.connect(filter)
