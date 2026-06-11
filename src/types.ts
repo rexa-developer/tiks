@@ -16,6 +16,8 @@ export interface TiksOptions {
   muted?: boolean
   /** Auto-mute when the user prefers reduced motion. Default: `true`. */
   respectReducedMotion?: boolean
+  /** Minimum ms between hover() sounds. Default: `80`. `0` disables throttling. */
+  hoverThrottleMs?: number
 }
 
 export type SoundGenerator = (

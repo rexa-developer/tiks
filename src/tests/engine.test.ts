@@ -1,5 +1,6 @@
-import { describe, it, expect, vi } from 'vitest'
+import { describe, it, expect, vi, afterEach } from 'vitest'
 import { audioEngine } from '../engine'
+import { TiksEngine } from '../tiks'
 
 const testTheme = {
   name: 'test', baseFreq: 440, noiseColor: 'white' as const,
@@ -162,5 +163,87 @@ describe('AudioEngine', () => {
     ctx.resume.mockClear()
     document.dispatchEvent(new Event('pointerdown'))
     expect(ctx.resume).not.toHaveBeenCalled()
+  })
+})
+
+describe('AudioEngine – hover throttling', () => {
+  const testTheme = {
+    name: 'test', baseFreq: 440, noiseColor: 'white' as const,
+    oscType: 'sine' as const, filterFreq: 3000, filterQ: 0.7,
+    attack: 0.002, decay: 1.0, brightness: 200,
+  }
+
+  afterEach(() => {
+    // Restore any mocked performance.now and reset throttle to default
+    vi.restoreAllMocks()
+    audioEngine.init({ hoverThrottleMs: 80 })
+  })
+
+  it('two playHover calls 10 ms apart → generator called once', () => {
+    // Advance clock well past default window to clear any residual _lastHoverAt
+    const nowSpy = vi.spyOn(performance, 'now').mockReturnValue(10_000)
+    audioEngine.init({ hoverThrottleMs: 80 })
+    const generator = vi.fn()
+
+    audioEngine.playHover(generator, testTheme)  // t=10000 → plays
+    nowSpy.mockReturnValue(10_010)
+    audioEngine.playHover(generator, testTheme)  // t=10010, delta=10 < 80 → blocked
+
+    expect(generator).toHaveBeenCalledOnce()
+  })
+
+  it('two playHover calls 100 ms apart → generator called twice', () => {
+    const nowSpy = vi.spyOn(performance, 'now').mockReturnValue(20_000)
+    audioEngine.init({ hoverThrottleMs: 80 })
+    const generator = vi.fn()
+
+    audioEngine.playHover(generator, testTheme)  // t=20000 → plays
+    nowSpy.mockReturnValue(20_100)
+    audioEngine.playHover(generator, testTheme)  // t=20100, delta=100 > 80 → plays
+
+    expect(generator).toHaveBeenCalledTimes(2)
+  })
+
+  it('init({ hoverThrottleMs: 0 }) → two immediate calls both play', () => {
+    const nowSpy = vi.spyOn(performance, 'now').mockReturnValue(30_000)
+    audioEngine.init({ hoverThrottleMs: 0 })
+    const generator = vi.fn()
+
+    audioEngine.playHover(generator, testTheme)
+    nowSpy.mockReturnValue(30_000)  // same time, delta=0, but 0 < 0 is false → plays
+    audioEngine.playHover(generator, testTheme)
+
+    expect(generator).toHaveBeenCalledTimes(2)
+  })
+
+  it('init({ hoverThrottleMs: 200 }): call at +100 ms blocked, at +250 ms plays', () => {
+    const nowSpy = vi.spyOn(performance, 'now').mockReturnValue(40_000)
+    audioEngine.init({ hoverThrottleMs: 200 })
+    const generator = vi.fn()
+
+    audioEngine.playHover(generator, testTheme)  // t=40000 → plays
+    nowSpy.mockReturnValue(40_100)
+    audioEngine.playHover(generator, testTheme)  // delta=100 < 200 → blocked
+    expect(generator).toHaveBeenCalledOnce()
+
+    nowSpy.mockReturnValue(40_250)
+    audioEngine.playHover(generator, testTheme)  // delta=250 > 200 → plays
+    expect(generator).toHaveBeenCalledTimes(2)
+  })
+
+  it('throttle is global: two TiksEngine instances hovering within 10 ms → playSound called once', () => {
+    const nowSpy = vi.spyOn(performance, 'now').mockReturnValue(50_000)
+    audioEngine.init({ hoverThrottleMs: 80 })
+
+    const playSoundSpy = vi.spyOn(audioEngine, 'playSound')
+    const engine1 = new TiksEngine()
+    const engine2 = new TiksEngine()
+
+    engine1.hover()  // t=50000 → passes throttle, calls playSound
+    nowSpy.mockReturnValue(50_010)
+    engine2.hover()  // t=50010, delta=10 < 80 → blocked, playSound NOT called again
+
+    expect(playSoundSpy).toHaveBeenCalledOnce()
+    playSoundSpy.mockRestore()
   })
 })

@@ -34,7 +34,7 @@ export class TiksEngine {
   }
 
   hover() {
-    audioEngine.playSound(generators.hover, this.theme)
+    audioEngine.playHover(generators.hover, this.theme)
   }
 
   pop() {

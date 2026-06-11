@@ -19,6 +19,8 @@ class AudioEngine {
   private _unlockBound = false
   private _reducedMotionBound = false
   private _unlockTeardown: (() => void) | null = null
+  private _hoverThrottleMs = 80
+  private _lastHoverAt = -Infinity
 
   init(options?: TiksOptions) {
     if (!AudioCtxCtor) return
@@ -27,6 +29,10 @@ class AudioEngine {
     if (this.masterGain) this.masterGain.gain.value = this._volume
 
     if (options?.muted !== undefined) this._muted = options.muted
+
+    if (options?.hoverThrottleMs !== undefined) {
+      this._hoverThrottleMs = Math.max(0, options.hoverThrottleMs)
+    }
 
     if (options?.respectReducedMotion !== undefined) {
       this._respectReducedMotion = options.respectReducedMotion
@@ -167,6 +173,16 @@ class AudioEngine {
     }
 
     generator(ctx, master, theme)
+  }
+
+  // hover() fires on every pointer pass; gate it to one tick per interval so
+  // dense UIs can't machine-gun the sound (README told users to debounce —
+  // now the engine does).
+  playHover(generator: SoundGenerator, theme: TiksTheme) {
+    const now = typeof performance !== 'undefined' ? performance.now() : Date.now()
+    if (now - this._lastHoverAt < this._hoverThrottleMs) return
+    this._lastHoverAt = now
+    this.playSound(generator, theme)
   }
 
   mute() {

@@ -48,10 +48,11 @@ That's it. Three lines.
 | `swoosh()` | Quick transition whoosh | ~120ms |
 | `notify()` | Bright attention ping | ~300ms |
 
-> **`hover()` is a high-frequency primitive — use sparingly.** Hover fires
-> constantly as the pointer moves, and audio on every hover causes fatigue.
-> Reserve it for deliberate, low-density targets (and debounce it); never bind
-> it to dense lists, menus, or whole-page hover regions.
+> **`hover()` is a high-frequency primitive — use sparingly.** The engine
+> throttles it to one tick per 80 ms by default, so dense pointer movement
+> can't machine-gun the sound. Adjust with `init({ hoverThrottleMs })` or
+> pass `0` to disable. Still, reserve `hover()` for deliberate, low-density
+> targets — never bind it to dense lists, menus, or whole-page hover regions.
 
 ## Themes
 
@@ -114,6 +115,7 @@ tiks.init({
   volume: 0.4,                // 0.0 - 1.0
   muted: false,               // Mute/unmute. Last explicit value wins (shared globally).
   respectReducedMotion: true,  // Default: true. Set false to always play. Last explicit value wins across init()/useTiks calls.
+  hoverThrottleMs: 80,        // Min ms between hover() sounds. 0 disables.
 })
 ```
 
