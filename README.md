@@ -3,7 +3,7 @@
 **Procedural UI sounds for the web. Zero audio files. Pure synthesis.**
 
 [![npm](https://img.shields.io/npm/v/@rexa-developer/tiks)](https://www.npmjs.com/package/@rexa-developer/tiks)
-[![gzip size](https://img.shields.io/badge/gzip-~2KB-brightgreen)](https://bundlephobia.com/package/@rexa-developer/tiks)
+[![gzip size](https://img.shields.io/badge/gzip-~3.5KB-brightgreen)](https://bundlephobia.com/package/@rexa-developer/tiks)
 [![license](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
 Every native app has satisfying sounds — iOS toggle clicks, macOS trash crumple, Android keyboard taps. Web apps have nothing. **tiks** brings that missing sensory layer using the Web Audio API. Every sound is generated at runtime through oscillators, noise buffers, and gain envelopes. No audio files shipped. Just math.
@@ -274,9 +274,12 @@ No audio files. No downloads. No decoding. Just oscillators and math.
 
 | Entry | Gzipped |
 |-------|---------|
-| Core (`tiks`) | ~2KB |
-| React hook (`tiks/react`) | ~300B |
-| Vue composable (`tiks/vue`) | ~300B |
+| Core (`tiks`) — 10 sounds, 4 themes, `bindTiks`, `createTiks` | ~3.5KB |
+| React hook (`tiks/react`) | +~380B |
+| Vue composable (`tiks/vue`) | +~280B |
+| Svelte (`tiks/svelte`) / Solid (`tiks/solid`) | +~90B each |
+
+Unused sounds and helpers tree-shake out of bundler builds; the core number is the everything-included CDN cost.
 
 ## License
 
