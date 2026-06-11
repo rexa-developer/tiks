@@ -12,7 +12,8 @@ class AudioEngine {
   private masterGain: GainNode | null = null
   private limiter: DynamicsCompressorNode | null = null
   private _muted = false
-  private _reducedMotionMuted = false
+  private _respectReducedMotion = true      // policy: should the preference mute us?
+  private _reducedMotionPreferred = false   // raw OS preference, tracked by the listener
   private _volume = 0.3
   private _lifecycleBound = false
   private _unlockBound = false
@@ -27,7 +28,10 @@ class AudioEngine {
 
     if (options?.muted) this._muted = true
 
-    this.bindReducedMotion(options?.respectReducedMotion)
+    if (options?.respectReducedMotion !== undefined) {
+      this._respectReducedMotion = options.respectReducedMotion
+    }
+    this.bindReducedMotion()
     this.bindLifecycle()
     this.bindGestureUnlock()
   }
@@ -54,17 +58,19 @@ class AudioEngine {
     return this.ctx
   }
 
-  // prefers-reduced-motion is respected by default. Tracked separately from
-  // explicit mute() so an OS-level preference change can't be silently
-  // overridden, and unmute() never re-enables sound the user asked to suppress.
-  private bindReducedMotion(enabled?: boolean) {
-    if (enabled === false) return
+  // prefers-reduced-motion is respected by default. The listener is bound once
+  // and tracks the raw OS preference in _reducedMotionPreferred. Whether that
+  // preference actually mutes playback is controlled separately by
+  // _respectReducedMotion (the policy). This split means unmute() never
+  // re-enables sound the user asked to suppress, and an explicit
+  // respectReducedMotion: false opt-out is always honored regardless of init order.
+  private bindReducedMotion() {
     if (this._reducedMotionBound) return
     if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return
     this._reducedMotionBound = true
 
     const mq = window.matchMedia('(prefers-reduced-motion: reduce)')
-    const apply = () => { this._reducedMotionMuted = mq.matches }
+    const apply = () => { this._reducedMotionPreferred = mq.matches }
     apply()
     mq.addEventListener('change', apply)
   }
@@ -137,7 +143,7 @@ class AudioEngine {
   }
 
   playSound(generator: SoundGenerator, theme: TiksTheme) {
-    if (this._muted || this._reducedMotionMuted) return
+    if (this._muted || (this._respectReducedMotion && this._reducedMotionPreferred)) return
     // No context yet means no gesture has happened. Bail silently — a hover
     // sound triggered before any user interaction can't play under autoplay
     // policy anyway, and constructing a context here would re-introduce the
@@ -169,7 +175,7 @@ class AudioEngine {
   }
 
   isMuted(): boolean {
-    return this._muted || this._reducedMotionMuted
+    return this._muted || (this._respectReducedMotion && this._reducedMotionPreferred)
   }
 
   setVolume(v: number) {

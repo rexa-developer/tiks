@@ -113,7 +113,7 @@ tiks.init({
   theme: 'soft',              // 'soft' | 'crisp' | custom theme
   volume: 0.4,                // 0.0 - 1.0
   muted: false,               // Start muted
-  respectReducedMotion: true,  // Default: true. Set false to always play.
+  respectReducedMotion: true,  // Default: true. Set false to always play. Last explicit value wins across init()/useTiks calls.
 })
 ```
 
