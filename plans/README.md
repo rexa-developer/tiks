@@ -15,9 +15,34 @@ your row when done.
 | 004 | Release automation: demo-pin sync script + tag-triggered publish with provenance | P2 | M | — (land after 001–003 so first automated release includes fixes) | DONE (branch `advisor/004-release-automation`, commit `3947f08`, merged to main 2026-06-11) |
 | 005 | Add CLAUDE.md (commands, architecture, Web Audio invariants) | P2 | S | best after 001/002/004 (documents their semantics) | DONE (branch `advisor/005-add-claude-md`, commit `226dfc2`, includes 001+002+004, merged to main 2026-06-11) |
 
+### Round 2 (planned 2026-06-11 against `5ea26e0`)
+
+Execution chain: each branch builds on the previous (006 → 007 → … → 013), so the final branch contains the whole round. 013 (lint/format) runs LAST because it reformats files the other plans create.
+
+| Plan | Title | Priority | Effort | Depends on | Status |
+|------|-------|----------|--------|------------|--------|
+| 006 | Fix gesture-unlock dead-end (resume resolves non-running) | P1 | S | — | DONE (branch `advisor/006-fix-gesture-unlock-deadend`, HEAD `ea4fb22` — approved after 1 revision: worktree had stale base, corrected by merging main) |
+| 007 | Generator characterization tests (envelopes, frequencies, scheduling) | P1 | M | 006 (chain) | DONE (branch `advisor/007-generator-characterization-tests`, commit `c2497ee` — approved; 94 tests) |
+| 008 | Dedupe toggleOn/toggleOff into one factory | P2 | S | 007 (hard — needs the test net) | DONE (branch `advisor/008-dedupe-toggle-generators`, commit `f9391f7` — approved; tests untouched) |
+| 009 | Built-in hover throttling (`hoverThrottleMs`, default 80) | P2 | S | 006 (same file) | DONE (branch `advisor/009-hover-throttling`, commit `71bd5a3` — approved; 99 tests) |
+| 010 | Declarative `data-tiks` click binding (`bindTiks`) | P3 | M | 009 (chain) | DONE (branch `advisor/010-data-tiks-autobind`, commit `edd2026` — approved; core gzip 3352B, +430B for 009+010) |
+| 011 | Theme presets: `arcade` + `glass` (paper-designed; tune by ear before release) | P3 | S | 010 (chain) | DONE (branch `advisor/011-theme-presets`, commit `3cf362a` — approved; 131 tests; NEEDS EAR TUNING before release) |
+| 012 | `createTiks` factory + Svelte/Solid subpath adapters (zero new peer deps) | P3 | M | 011 (chain) | DONE (branch `advisor/012-svelte-solid-adapters`, commit `62388e4` — approved; 137 tests, subpaths verified ESM+CJS) |
+| 013 | Biome lint/format + CI gate (style-preserving config) | P2 | S–M | 006–012 (must run last) | DONE (branch `advisor/013-biome-lint-format`, commit `d3eaf9b` — approved; accepted deviation: 363-line mechanical format diff incl. one-liner brace expansion) |
+
 Status values: TODO | IN PROGRESS | DONE | BLOCKED (with one-line reason) | REJECTED (with one-line rationale)
 
-## Execution record (2026-06-11)
+## Execution record — round 2 (2026-06-11)
+
+All eight round-2 plans (006–013) were executed on a stacked branch chain, each reviewed and approved, then **merged to `main`** via fast-forward to `d3eaf9b`. Post-merge verification on clean main: typecheck clean, lint exit 0 (1 non-blocking warning: unused `afterEach` import in `src/tests/create.test.ts:1`), 137/137 tests, build clean, audit 0 vulnerabilities. All advisor branches and agent worktrees deleted.
+
+Outstanding follow-ups for the maintainer:
+- **Audition `arcade` and `glass` presets by ear** on the demo before the next release (values are paper-designed; plan 011 maintenance notes).
+- README's "~2KB gzip" badge is stale — core is now ~3.3 KB gzip (was ~2.9 KB before round 2).
+- Clear the unused-import lint warning (`npm run lint:fix -- --unsafe` or hand-edit).
+- One executor (plan 006) needed a revision because its worktree was created from a stale base commit; later dispatches mitigated by merging the previous chain branch first.
+
+## Execution record — round 1 (2026-06-11)
 
 All five plans were executed by subagents in isolated worktrees, approved on review, and **merged to `main`** (fast-forward to `226dfc2`, then merge commit `13bc812` for plan 003). Post-merge verification: typecheck clean, 79/79 tests, `npm audit` 0 vulnerabilities, build clean. Advisor branches and agent worktrees deleted after merge.
 
