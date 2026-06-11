@@ -75,6 +75,31 @@ describe('AudioEngine', () => {
     audioEngine.unmute()
   })
 
+  it('init({ muted: false }) unmutes after init({ muted: true })', () => {
+    audioEngine.init({ muted: true })
+    expect(audioEngine.isMuted()).toBe(true)
+    audioEngine.init({ muted: false })
+    expect(audioEngine.isMuted()).toBe(false)
+    audioEngine.unmute()
+  })
+
+  it('init() without muted option does not clobber existing mute state', () => {
+    audioEngine.init({ muted: true })
+    expect(audioEngine.isMuted()).toBe(true)
+    audioEngine.init()
+    expect(audioEngine.isMuted()).toBe(true)
+    audioEngine.unmute()
+  })
+
+  it('init({ muted: false }) allows playSound to call the generator', () => {
+    audioEngine.init({ muted: true })
+    audioEngine.init({ muted: false })
+    const generator = vi.fn()
+    audioEngine.playSound(generator, testTheme)
+    expect(generator).toHaveBeenCalledOnce()
+    audioEngine.unmute()
+  })
+
   it('resumes suspended context on pageshow (bfcache restore)', () => {
     audioEngine.init()
     const ctx = audioEngine.getContext() as unknown as { state: AudioContextState; resume: ReturnType<typeof vi.fn> }

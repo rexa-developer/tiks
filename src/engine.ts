@@ -26,7 +26,7 @@ class AudioEngine {
     if (options?.volume !== undefined) this._volume = Math.max(0, Math.min(1, options.volume))
     if (this.masterGain) this.masterGain.gain.value = this._volume
 
-    if (options?.muted) this._muted = true
+    if (options?.muted !== undefined) this._muted = options.muted
 
     if (options?.respectReducedMotion !== undefined) {
       this._respectReducedMotion = options.respectReducedMotion
