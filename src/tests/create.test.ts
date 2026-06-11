@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, it, vi } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { createTiks } from '../create'
 import { audioEngine } from '../engine'
 import { useTiks as solidTiks } from '../solid'
