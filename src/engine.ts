@@ -102,7 +102,10 @@ class AudioEngine {
       if (!c) return
       if (c.state === 'suspended') {
         c.resume().then(
-          () => { if (c.state === 'running') this._unlockTeardown?.() },
+          () => {
+            if (c.state === 'running') this._unlockTeardown?.()
+            else unlocking = false
+          },
           () => { unlocking = false },
         )
       }
