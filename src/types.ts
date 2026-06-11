@@ -26,4 +26,4 @@ export type SoundGenerator = (
   theme: TiksTheme,
 ) => void
 
-export type ThemeName = 'soft' | 'crisp'
+export type ThemeName = 'soft' | 'crisp' | 'arcade' | 'glass'

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { resolveTheme, defineTheme, SOFT_THEME, CRISP_THEME } from '../themes'
+import { resolveTheme, defineTheme, SOFT_THEME, CRISP_THEME, ARCADE_THEME, GLASS_THEME } from '../themes'
 
 describe('ThemeRegistry', () => {
   it('resolveTheme("soft") returns SOFT_THEME', () => {
@@ -57,5 +57,29 @@ describe('ThemeRegistry', () => {
     expect(CRISP_THEME.baseFreq).toBe(523)
     expect(CRISP_THEME.oscType).toBe('triangle')
     expect(CRISP_THEME.decay).toBe(0.6)
+  })
+
+  it('resolveTheme("arcade") returns ARCADE_THEME', () => {
+    expect(resolveTheme('arcade')).toBe(ARCADE_THEME)
+  })
+
+  it('resolveTheme("glass") returns GLASS_THEME', () => {
+    expect(resolveTheme('glass')).toBe(GLASS_THEME)
+  })
+
+  it('ARCADE_THEME has expected values', () => {
+    expect(ARCADE_THEME.baseFreq).toBe(392)
+    expect(ARCADE_THEME.oscType).toBe('square')
+    expect(ARCADE_THEME.decay).toBe(0.5)
+    expect(ARCADE_THEME.filterQ).toBe(5.0)
+    expect(ARCADE_THEME.noiseColor).toBe('white')
+  })
+
+  it('GLASS_THEME has expected values', () => {
+    expect(GLASS_THEME.baseFreq).toBe(660)
+    expect(GLASS_THEME.oscType).toBe('sine')
+    expect(GLASS_THEME.decay).toBe(1.4)
+    expect(GLASS_THEME.filterQ).toBe(6.0)
+    expect(GLASS_THEME.noiseColor).toBe('pink')
   })
 })

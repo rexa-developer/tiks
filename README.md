@@ -56,11 +56,13 @@ That's it. Three lines.
 
 ## Themes
 
-Two built-in themes that change the character of every sound:
+Four built-in themes that change the character of every sound:
 
 ```ts
 tiks.init({ theme: 'soft' })   // Warm, rounded, Apple-like (default)
 tiks.init({ theme: 'crisp' })  // Sharp, tactile, mechanical keyboard feel
+tiks.init({ theme: 'arcade' }) // Chunky 8-bit, square-wave chiptune character
+tiks.init({ theme: 'glass' })  // Airy, resonant, high and ringing
 ```
 
 Switch at runtime:
@@ -111,7 +113,7 @@ tiks.setTheme('crisp')
 
 ```ts
 tiks.init({
-  theme: 'soft',              // 'soft' | 'crisp' | custom theme
+  theme: 'soft',              // 'soft' | 'crisp' | 'arcade' | 'glass' | custom theme
   volume: 0.4,                // 0.0 - 1.0
   muted: false,               // Mute/unmute. Last explicit value wins (shared globally).
   respectReducedMotion: true,  // Default: true. Set false to always play. Last explicit value wins across init()/useTiks calls.

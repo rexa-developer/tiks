@@ -8,7 +8,7 @@ import { hover } from '../generators/hover'
 import { pop } from '../generators/pop'
 import { swoosh } from '../generators/swoosh'
 import { notify } from '../generators/notify'
-import { SOFT_THEME, CRISP_THEME } from '../themes'
+import { SOFT_THEME, CRISP_THEME, ARCADE_THEME, GLASS_THEME } from '../themes'
 import type { TiksTheme } from '../types'
 
 function createMockContext() {
@@ -45,6 +45,18 @@ describe('Sound Generators', () => {
       const ctx = createMockContext()
       const dest = createMockDest()
       expect(() => fn(ctx, dest, CRISP_THEME)).not.toThrow()
+    })
+
+    it(`${name} does not throw with arcade theme`, () => {
+      const ctx = createMockContext()
+      const dest = createMockDest()
+      expect(() => fn(ctx, dest, ARCADE_THEME)).not.toThrow()
+    })
+
+    it(`${name} does not throw with glass theme`, () => {
+      const ctx = createMockContext()
+      const dest = createMockDest()
+      expect(() => fn(ctx, dest, GLASS_THEME)).not.toThrow()
     })
   }
 

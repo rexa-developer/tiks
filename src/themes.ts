@@ -24,9 +24,35 @@ export const CRISP_THEME: TiksTheme = {
   brightness: 4000,
 }
 
+export const ARCADE_THEME: TiksTheme = {
+  name: 'arcade',
+  baseFreq: 392,        // G4 — lower root, chunky
+  noiseColor: 'white',
+  oscType: 'square',    // chiptune character
+  filterFreq: 2200,
+  filterQ: 5.0,
+  attack: 0.001,
+  decay: 0.5,           // short and punchy
+  brightness: 2800,
+}
+
+export const GLASS_THEME: TiksTheme = {
+  name: 'glass',
+  baseFreq: 660,        // E5 — high, airy
+  noiseColor: 'pink',
+  oscType: 'sine',
+  filterFreq: 6500,
+  filterQ: 6.0,         // resonant, "ping"
+  attack: 0.004,        // softer onset
+  decay: 1.4,           // longer ring
+  brightness: 5500,
+}
+
 const themes: Record<ThemeName, TiksTheme> = {
   soft: SOFT_THEME,
   crisp: CRISP_THEME,
+  arcade: ARCADE_THEME,
+  glass: GLASS_THEME,
 }
 
 export function resolveTheme(theme: ThemeName | TiksTheme): TiksTheme {

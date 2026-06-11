@@ -8,7 +8,7 @@ export { tiks, TiksEngine }
 export type { TiksTheme, TiksOptions, SoundGenerator, ThemeName } from './types'
 
 // Theme utilities
-export { defineTheme, resolveTheme, SOFT_THEME, CRISP_THEME } from './themes'
+export { defineTheme, resolveTheme, SOFT_THEME, CRISP_THEME, ARCADE_THEME, GLASS_THEME } from './themes'
 
 // Tree-shakeable functional API
 export function init(options?: TiksOptions) { tiks.init(options) }
