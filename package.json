@@ -26,6 +26,16 @@
       "types": "./dist/vue.d.ts",
       "import": "./dist/vue.js",
       "require": "./dist/vue.cjs"
+    },
+    "./svelte": {
+      "types": "./dist/svelte.d.ts",
+      "import": "./dist/svelte.js",
+      "require": "./dist/svelte.cjs"
+    },
+    "./solid": {
+      "types": "./dist/solid.d.ts",
+      "import": "./dist/solid.js",
+      "require": "./dist/solid.cjs"
     }
   },
   "main": "./dist/index.cjs",

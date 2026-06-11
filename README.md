@@ -163,6 +163,32 @@ const { click, success, error } = useTiks()
 
 The composable auto-initializes on component mount. Same global/per-instance semantics as the React hook: `volume` and `muted` are shared across all `useTiks` calls, `theme` is per-composable.
 
+## Svelte
+
+```ts
+import { useTiks } from '@rexa-developer/tiks/svelte'
+
+const { click, success, error } = useTiks()
+
+// In your component:
+// <button on:click={click}>Click me</button>
+```
+
+Call `useTiks()` inside your component's `<script>` block. Same global/per-instance semantics: `volume` and `muted` are shared globally, `theme` is per-call. No Svelte APIs are imported — the adapter is a plain function wrapper.
+
+## Solid
+
+```ts
+import { useTiks } from '@rexa-developer/tiks/solid'
+
+const { click, toggle } = useTiks()
+
+// In your JSX:
+// <button onClick={click}>Click me</button>
+```
+
+Call `useTiks()` at component scope. Same global/per-instance semantics: `volume` and `muted` are shared globally, `theme` is per-call. No Solid APIs are imported — the adapter is a plain function wrapper.
+
 ## Tree-Shakeable Imports
 
 For minimal bundles, import only the sounds you need:
@@ -173,6 +199,18 @@ import { init, click, success } from '@rexa-developer/tiks'
 init()
 click()
 success()
+```
+
+For **multiple independent instances** (different themes on the same page), use `createTiks()`:
+
+```ts
+import { createTiks } from '@rexa-developer/tiks'
+
+const ui = createTiks({ theme: 'crisp' })
+const game = createTiks({ theme: 'arcade' })
+
+ui.click()    // crisp theme
+game.notify() // arcade theme
 ```
 
 ## CDN

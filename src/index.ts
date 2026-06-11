@@ -28,3 +28,7 @@ export function setTheme(t: ThemeName | TiksTheme) { tiks.setTheme(t) }
 
 // Declarative auto-binding
 export { bindTiks } from './bind'
+
+// Multi-instance factory
+export { createTiks } from './create'
+export type { TiksApi } from './create'
