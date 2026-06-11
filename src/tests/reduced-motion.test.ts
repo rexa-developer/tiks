@@ -1,24 +1,42 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 type Listener = () => void
 
 const testTheme = {
-  name: 'test', baseFreq: 440, noiseColor: 'white' as const,
-  oscType: 'sine' as const, filterFreq: 3000, filterQ: 0.7,
-  attack: 0.002, decay: 1.0, brightness: 200,
+  name: 'test',
+  baseFreq: 440,
+  noiseColor: 'white' as const,
+  oscType: 'sine' as const,
+  filterFreq: 3000,
+  filterQ: 0.7,
+  attack: 0.002,
+  decay: 1.0,
+  brightness: 200,
 }
 
 function installMatchMedia(initialMatches: boolean) {
   let matches = initialMatches
   const listeners = new Set<Listener>()
   const mql = {
-    get matches() { return matches },
-    addEventListener: (_: string, fn: Listener) => { listeners.add(fn) },
-    removeEventListener: (_: string, fn: Listener) => { listeners.delete(fn) },
+    get matches() {
+      return matches
+    },
+    addEventListener: (_: string, fn: Listener) => {
+      listeners.add(fn)
+    },
+    removeEventListener: (_: string, fn: Listener) => {
+      listeners.delete(fn)
+    },
   }
-  vi.stubGlobal('matchMedia', vi.fn(() => mql))
+  vi.stubGlobal(
+    'matchMedia',
+    vi.fn(() => mql),
+  )
   return {
-    setMatches(v: boolean) { matches = v; listeners.forEach(fn => fn()) },
+    setMatches(v: boolean) {
+      matches = v
+      listeners.forEach((fn) => fn())
+    },
   }
 }
 
@@ -28,7 +46,9 @@ async function freshEngine() {
   return mod.audioEngine
 }
 
-beforeEach(() => { vi.unstubAllGlobals() })
+beforeEach(() => {
+  vi.unstubAllGlobals()
+})
 
 describe('reduced-motion opt-out', () => {
   it('default respects the preference: matchMedia matches=true → isMuted() is true; generator not called', async () => {

@@ -9,7 +9,12 @@ class MockGainNode {
 
 class MockOscillatorNode {
   type: OscillatorType = 'sine'
-  frequency = { value: 440, setValueAtTime: vi.fn(), exponentialRampToValueAtTime: vi.fn(), linearRampToValueAtTime: vi.fn() }
+  frequency = {
+    value: 440,
+    setValueAtTime: vi.fn(),
+    exponentialRampToValueAtTime: vi.fn(),
+    linearRampToValueAtTime: vi.fn(),
+  }
   connect = vi.fn(() => this)
   disconnect = vi.fn()
   start = vi.fn()
@@ -18,7 +23,12 @@ class MockOscillatorNode {
 
 class MockBiquadFilterNode {
   type: BiquadFilterType = 'lowpass'
-  frequency = { value: 350, setValueAtTime: vi.fn(), exponentialRampToValueAtTime: vi.fn(), linearRampToValueAtTime: vi.fn() }
+  frequency = {
+    value: 350,
+    setValueAtTime: vi.fn(),
+    exponentialRampToValueAtTime: vi.fn(),
+    linearRampToValueAtTime: vi.fn(),
+  }
   Q = { value: 1, setValueAtTime: vi.fn() }
   connect = vi.fn(() => this)
   disconnect = vi.fn()

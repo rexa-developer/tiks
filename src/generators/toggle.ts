@@ -3,7 +3,8 @@ import { createNoiseSource, startTime } from './_util'
 
 // Pitch snap with a noise transient. On rises 0.8x → 1.2x; off falls
 // 1.0x → 0.6x (ending below on's peak so the pair reads as open/close).
-const makeToggle = (startRatio: number, endRatio: number): SoundGenerator =>
+const makeToggle =
+  (startRatio: number, endRatio: number): SoundGenerator =>
   (ctx, dest, theme) => {
     const now = startTime(ctx)
     const duration = Math.max(0.06 * theme.decay, 0.005)

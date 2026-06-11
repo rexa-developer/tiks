@@ -1,14 +1,14 @@
-import { describe, it, expect, vi } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { click } from '../generators/click'
-import { toggleOn, toggleOff } from '../generators/toggle'
-import { success } from '../generators/success'
 import { error } from '../generators/error'
-import { warning } from '../generators/warning'
 import { hover } from '../generators/hover'
-import { pop } from '../generators/pop'
-import { swoosh } from '../generators/swoosh'
 import { notify } from '../generators/notify'
-import { SOFT_THEME, CRISP_THEME, ARCADE_THEME, GLASS_THEME } from '../themes'
+import { pop } from '../generators/pop'
+import { success } from '../generators/success'
+import { swoosh } from '../generators/swoosh'
+import { toggleOff, toggleOn } from '../generators/toggle'
+import { warning } from '../generators/warning'
+import { ARCADE_THEME, CRISP_THEME, GLASS_THEME, SOFT_THEME } from '../themes'
 import type { TiksTheme } from '../types'
 
 function createMockContext() {
@@ -101,10 +101,7 @@ describe('Sound Generators', () => {
       // Osc voice (first oscillator)
       const osc = oscSpy.mock.results[0].value
       expect(osc.frequency.setValueAtTime).toHaveBeenCalledWith(SOFT_THEME.baseFreq * 0.8, now)
-      expect(osc.frequency.exponentialRampToValueAtTime).toHaveBeenCalledWith(
-        SOFT_THEME.baseFreq * 1.2,
-        now + dur,
-      )
+      expect(osc.frequency.exponentialRampToValueAtTime).toHaveBeenCalledWith(SOFT_THEME.baseFreq * 1.2, now + dur)
       expect(osc.start).toHaveBeenCalledWith(now)
       expect(osc.stop).toHaveBeenCalledWith(now + dur)
 
@@ -155,10 +152,7 @@ describe('Sound Generators', () => {
 
       const osc = oscSpy.mock.results[0].value
       expect(osc.frequency.setValueAtTime).toHaveBeenCalledWith(SOFT_THEME.baseFreq, now)
-      expect(osc.frequency.exponentialRampToValueAtTime).toHaveBeenCalledWith(
-        SOFT_THEME.baseFreq * 0.6,
-        now + dur,
-      )
+      expect(osc.frequency.exponentialRampToValueAtTime).toHaveBeenCalledWith(SOFT_THEME.baseFreq * 0.6, now + dur)
       expect(osc.start).toHaveBeenCalledWith(now)
       expect(osc.stop).toHaveBeenCalledWith(now + dur)
 

@@ -1,10 +1,25 @@
-import { describe, it, expect } from 'vitest'
-import {
-  tiks, init, click, toggle, success, error, warning,
-  hover, pop, swoosh, notify, mute, unmute, setVolume, setTheme,
-  defineTheme, SOFT_THEME, CRISP_THEME,
-} from '../index'
+import { describe, expect, it } from 'vitest'
 import { audioEngine } from '../engine'
+import {
+  CRISP_THEME,
+  click,
+  defineTheme,
+  error,
+  hover,
+  init,
+  mute,
+  notify,
+  pop,
+  SOFT_THEME,
+  setTheme,
+  setVolume,
+  success,
+  swoosh,
+  tiks,
+  toggle,
+  unmute,
+  warning,
+} from '../index'
 
 describe('Functional API', () => {
   it('exports all sound functions', () => {

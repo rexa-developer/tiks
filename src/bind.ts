@@ -24,10 +24,7 @@ export function bindTiks(root: Document | Element = document): () => void {
     if (!value) return
 
     if (value === 'toggle') {
-      const state =
-        el instanceof HTMLInputElement
-          ? el.checked
-          : el.getAttribute('aria-pressed') === 'true'
+      const state = el instanceof HTMLInputElement ? el.checked : el.getAttribute('aria-pressed') === 'true'
       tiks.toggle(state)
       return
     }

@@ -12,8 +12,8 @@ class AudioEngine {
   private masterGain: GainNode | null = null
   private limiter: DynamicsCompressorNode | null = null
   private _muted = false
-  private _respectReducedMotion = true      // policy: should the preference mute us?
-  private _reducedMotionPreferred = false   // raw OS preference, tracked by the listener
+  private _respectReducedMotion = true // policy: should the preference mute us?
+  private _reducedMotionPreferred = false // raw OS preference, tracked by the listener
   private _volume = 0.3
   private _lifecycleBound = false
   private _unlockBound = false
@@ -76,7 +76,9 @@ class AudioEngine {
     this._reducedMotionBound = true
 
     const mq = window.matchMedia('(prefers-reduced-motion: reduce)')
-    const apply = () => { this._reducedMotionPreferred = mq.matches }
+    const apply = () => {
+      this._reducedMotionPreferred = mq.matches
+    }
     apply()
     mq.addEventListener('change', apply)
   }
@@ -118,7 +120,9 @@ class AudioEngine {
             if (c.state === 'running') this._unlockTeardown?.()
             else unlocking = false
           },
-          () => { unlocking = false },
+          () => {
+            unlocking = false
+          },
         )
       }
       // iOS Safari additionally needs a node started inside the gesture.
@@ -166,7 +170,9 @@ class AudioEngine {
     // tab-visibility restore). Schedule it once resume resolves instead.
     if (ctx.state === 'suspended') {
       ctx.resume().then(
-        () => { if (ctx.state === 'running') generator(ctx, master, theme) },
+        () => {
+          if (ctx.state === 'running') generator(ctx, master, theme)
+        },
         () => {},
       )
       return

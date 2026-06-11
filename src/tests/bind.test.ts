@@ -1,7 +1,7 @@
-import { describe, it, expect, vi, afterEach } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
+import { bindTiks } from '../bind'
 import { audioEngine } from '../engine'
 import * as generators from '../generators'
-import { bindTiks } from '../bind'
 
 describe('bindTiks', () => {
   let unbind: (() => void) | undefined

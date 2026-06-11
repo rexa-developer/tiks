@@ -20,10 +20,6 @@ export interface TiksOptions {
   hoverThrottleMs?: number
 }
 
-export type SoundGenerator = (
-  ctx: AudioContext,
-  dest: AudioNode,
-  theme: TiksTheme,
-) => void
+export type SoundGenerator = (ctx: AudioContext, dest: AudioNode, theme: TiksTheme) => void
 
 export type ThemeName = 'soft' | 'crisp' | 'arcade' | 'glass'

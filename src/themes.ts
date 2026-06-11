@@ -1,4 +1,4 @@
-import type { TiksTheme, ThemeName } from './types'
+import type { ThemeName, TiksTheme } from './types'
 
 export const SOFT_THEME: TiksTheme = {
   name: 'soft',
@@ -26,25 +26,25 @@ export const CRISP_THEME: TiksTheme = {
 
 export const ARCADE_THEME: TiksTheme = {
   name: 'arcade',
-  baseFreq: 392,        // G4 — lower root, chunky
+  baseFreq: 392, // G4 — lower root, chunky
   noiseColor: 'white',
-  oscType: 'square',    // chiptune character
+  oscType: 'square', // chiptune character
   filterFreq: 2200,
   filterQ: 5.0,
   attack: 0.001,
-  decay: 0.5,           // short and punchy
+  decay: 0.5, // short and punchy
   brightness: 2800,
 }
 
 export const GLASS_THEME: TiksTheme = {
   name: 'glass',
-  baseFreq: 660,        // E5 — high, airy
+  baseFreq: 660, // E5 — high, airy
   noiseColor: 'pink',
   oscType: 'sine',
   filterFreq: 6500,
-  filterQ: 6.0,         // resonant, "ping"
-  attack: 0.004,        // softer onset
-  decay: 1.4,           // longer ring
+  filterQ: 6.0, // resonant, "ping"
+  attack: 0.004, // softer onset
+  decay: 1.4, // longer ring
   brightness: 5500,
 }
 
@@ -64,8 +64,6 @@ export function resolveTheme(theme: ThemeName | TiksTheme): TiksTheme {
   return theme
 }
 
-export function defineTheme(
-  overrides: Partial<TiksTheme> & { name: string },
-): TiksTheme {
+export function defineTheme(overrides: Partial<TiksTheme> & { name: string }): TiksTheme {
   return { ...SOFT_THEME, ...overrides }
 }

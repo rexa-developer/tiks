@@ -1,5 +1,5 @@
 import { TiksEngine } from './tiks'
-import type { TiksOptions, TiksTheme, ThemeName } from './types'
+import type { ThemeName, TiksOptions, TiksTheme } from './types'
 
 export interface TiksApi {
   click: () => void

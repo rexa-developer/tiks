@@ -1,7 +1,7 @@
-import type { TiksOptions, TiksTheme, ThemeName } from './types'
 import { audioEngine } from './engine'
-import { resolveTheme, SOFT_THEME } from './themes'
 import * as generators from './generators'
+import { resolveTheme, SOFT_THEME } from './themes'
+import type { ThemeName, TiksOptions, TiksTheme } from './types'
 
 export class TiksEngine {
   private theme: TiksTheme = SOFT_THEME

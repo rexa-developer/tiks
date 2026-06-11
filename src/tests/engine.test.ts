@@ -1,11 +1,17 @@
-import { describe, it, expect, vi, afterEach } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import { audioEngine } from '../engine'
 import { TiksEngine } from '../tiks'
 
 const testTheme = {
-  name: 'test', baseFreq: 440, noiseColor: 'white' as const,
-  oscType: 'sine' as const, filterFreq: 3000, filterQ: 0.7,
-  attack: 0.002, decay: 1.0, brightness: 200,
+  name: 'test',
+  baseFreq: 440,
+  noiseColor: 'white' as const,
+  oscType: 'sine' as const,
+  filterFreq: 3000,
+  filterQ: 0.7,
+  attack: 0.002,
+  decay: 1.0,
+  brightness: 200,
 }
 
 describe('AudioEngine', () => {
@@ -63,11 +69,7 @@ describe('AudioEngine', () => {
     const generator = vi.fn()
     audioEngine.playSound(generator, testTheme)
     expect(generator).toHaveBeenCalledOnce()
-    expect(generator).toHaveBeenCalledWith(
-      audioEngine.getContext(),
-      audioEngine.getMasterGain(),
-      testTheme,
-    )
+    expect(generator).toHaveBeenCalledWith(audioEngine.getContext(), audioEngine.getMasterGain(), testTheme)
   })
 
   it('mutes when init with muted option', () => {
@@ -168,9 +170,15 @@ describe('AudioEngine', () => {
 
 describe('AudioEngine – hover throttling', () => {
   const testTheme = {
-    name: 'test', baseFreq: 440, noiseColor: 'white' as const,
-    oscType: 'sine' as const, filterFreq: 3000, filterQ: 0.7,
-    attack: 0.002, decay: 1.0, brightness: 200,
+    name: 'test',
+    baseFreq: 440,
+    noiseColor: 'white' as const,
+    oscType: 'sine' as const,
+    filterFreq: 3000,
+    filterQ: 0.7,
+    attack: 0.002,
+    decay: 1.0,
+    brightness: 200,
   }
 
   afterEach(() => {
@@ -185,9 +193,9 @@ describe('AudioEngine – hover throttling', () => {
     audioEngine.init({ hoverThrottleMs: 80 })
     const generator = vi.fn()
 
-    audioEngine.playHover(generator, testTheme)  // t=10000 → plays
+    audioEngine.playHover(generator, testTheme) // t=10000 → plays
     nowSpy.mockReturnValue(10_010)
-    audioEngine.playHover(generator, testTheme)  // t=10010, delta=10 < 80 → blocked
+    audioEngine.playHover(generator, testTheme) // t=10010, delta=10 < 80 → blocked
 
     expect(generator).toHaveBeenCalledOnce()
   })
@@ -197,9 +205,9 @@ describe('AudioEngine – hover throttling', () => {
     audioEngine.init({ hoverThrottleMs: 80 })
     const generator = vi.fn()
 
-    audioEngine.playHover(generator, testTheme)  // t=20000 → plays
+    audioEngine.playHover(generator, testTheme) // t=20000 → plays
     nowSpy.mockReturnValue(20_100)
-    audioEngine.playHover(generator, testTheme)  // t=20100, delta=100 > 80 → plays
+    audioEngine.playHover(generator, testTheme) // t=20100, delta=100 > 80 → plays
 
     expect(generator).toHaveBeenCalledTimes(2)
   })
@@ -210,7 +218,7 @@ describe('AudioEngine – hover throttling', () => {
     const generator = vi.fn()
 
     audioEngine.playHover(generator, testTheme)
-    nowSpy.mockReturnValue(30_000)  // same time, delta=0, but 0 < 0 is false → plays
+    nowSpy.mockReturnValue(30_000) // same time, delta=0, but 0 < 0 is false → plays
     audioEngine.playHover(generator, testTheme)
 
     expect(generator).toHaveBeenCalledTimes(2)
@@ -221,13 +229,13 @@ describe('AudioEngine – hover throttling', () => {
     audioEngine.init({ hoverThrottleMs: 200 })
     const generator = vi.fn()
 
-    audioEngine.playHover(generator, testTheme)  // t=40000 → plays
+    audioEngine.playHover(generator, testTheme) // t=40000 → plays
     nowSpy.mockReturnValue(40_100)
-    audioEngine.playHover(generator, testTheme)  // delta=100 < 200 → blocked
+    audioEngine.playHover(generator, testTheme) // delta=100 < 200 → blocked
     expect(generator).toHaveBeenCalledOnce()
 
     nowSpy.mockReturnValue(40_250)
-    audioEngine.playHover(generator, testTheme)  // delta=250 > 200 → plays
+    audioEngine.playHover(generator, testTheme) // delta=250 > 200 → plays
     expect(generator).toHaveBeenCalledTimes(2)
   })
 
@@ -239,9 +247,9 @@ describe('AudioEngine – hover throttling', () => {
     const engine1 = new TiksEngine()
     const engine2 = new TiksEngine()
 
-    engine1.hover()  // t=50000 → passes throttle, calls playSound
+    engine1.hover() // t=50000 → passes throttle, calls playSound
     nowSpy.mockReturnValue(50_010)
-    engine2.hover()  // t=50010, delta=10 < 80 → blocked, playSound NOT called again
+    engine2.hover() // t=50010, delta=10 < 80 → blocked, playSound NOT called again
 
     expect(playSoundSpy).toHaveBeenCalledOnce()
     playSoundSpy.mockRestore()

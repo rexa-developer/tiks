@@ -1,6 +1,6 @@
-import { describe, it, expect } from 'vitest'
-import { tiks } from '../tiks'
+import { describe, expect, it } from 'vitest'
 import { audioEngine } from '../engine'
+import { tiks } from '../tiks'
 
 describe('TiksEngine', () => {
   it('init followed by a user gesture creates audio context', () => {

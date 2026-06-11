@@ -1,16 +1,26 @@
-import { describe, it, expect, vi, afterEach } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import { createTiks } from '../create'
-import { useTiks as svelteTiks } from '../svelte'
-import { useTiks as solidTiks } from '../solid'
 import { audioEngine } from '../engine'
+import { useTiks as solidTiks } from '../solid'
+import { useTiks as svelteTiks } from '../svelte'
 
 describe('createTiks factory', () => {
   it('returns all 13 methods', () => {
     const api = createTiks()
     const methods = [
-      'click', 'toggle', 'success', 'error', 'warning',
-      'hover', 'pop', 'swoosh', 'notify', 'mute', 'unmute',
-      'setVolume', 'setTheme',
+      'click',
+      'toggle',
+      'success',
+      'error',
+      'warning',
+      'hover',
+      'pop',
+      'swoosh',
+      'notify',
+      'mute',
+      'unmute',
+      'setVolume',
+      'setTheme',
     ] as const
     for (const method of methods) {
       expect(typeof api[method], `${method} should be a function`).toBe('function')

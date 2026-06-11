@@ -4,7 +4,7 @@
  * Each test uses a fresh engine module via vi.resetModules() + dynamic import
  * to avoid the singleton from leaking state between cases.
  */
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 beforeEach(() => {
   vi.unstubAllGlobals()

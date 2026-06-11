@@ -1,5 +1,5 @@
-import { describe, it, expect } from 'vitest'
-import { resolveTheme, defineTheme, SOFT_THEME, CRISP_THEME, ARCADE_THEME, GLASS_THEME } from '../themes'
+import { describe, expect, it } from 'vitest'
+import { ARCADE_THEME, CRISP_THEME, defineTheme, GLASS_THEME, resolveTheme, SOFT_THEME } from '../themes'
 
 describe('ThemeRegistry', () => {
   it('resolveTheme("soft") returns SOFT_THEME', () => {

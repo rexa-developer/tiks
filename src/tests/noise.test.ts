@@ -1,5 +1,5 @@
-import { describe, it, expect, beforeEach } from 'vitest'
-import { getWhiteNoise, getPinkNoise, resetNoiseBuffers } from '../noise'
+import { beforeEach, describe, expect, it } from 'vitest'
+import { getPinkNoise, getWhiteNoise, resetNoiseBuffers } from '../noise'
 
 describe('NoiseBuffers', () => {
   let ctx: AudioContext

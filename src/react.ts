@@ -1,6 +1,6 @@
-import { useEffect, useRef, useMemo } from 'react'
+import { useEffect, useMemo, useRef } from 'react'
 import { TiksEngine } from './tiks'
-import type { TiksOptions, TiksTheme, ThemeName } from './types'
+import type { ThemeName, TiksOptions, TiksTheme } from './types'
 
 export function useTiks(options?: TiksOptions) {
   const engineRef = useRef<TiksEngine | null>(null)

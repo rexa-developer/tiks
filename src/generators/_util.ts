@@ -1,4 +1,4 @@
-import { getWhiteNoise, getPinkNoise } from '../noise'
+import { getPinkNoise, getWhiteNoise } from '../noise'
 import type { TiksTheme } from '../types'
 
 // Small offset so scheduled events are always in the future relative to the
