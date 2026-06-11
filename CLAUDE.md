@@ -94,5 +94,5 @@ requires the `NPM_TOKEN` repo secret).
 
 ## Plans directory
 
-`plans/` holds advisor-generated implementation plans; read `plans/README.md`
-before starting work there.
+`plans/` (local-only, gitignored) holds advisor-generated implementation plans
+and execution records; read `plans/README.md` before starting work there.

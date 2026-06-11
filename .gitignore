@@ -4,3 +4,4 @@ dist
 *.tsbuildinfo
 .focus/
 .claude/
+plans/
