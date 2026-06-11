@@ -182,6 +182,26 @@ success()
 </script>
 ```
 
+### Declarative binding (`data-tiks`)
+
+For a no-JS approach, annotate elements with `data-tiks` and call `bindTiks()` once:
+
+```html
+<button data-tiks="click">Save</button>
+<input type="checkbox" data-tiks="toggle">
+
+<script type="module">
+  import { bindTiks } from 'https://esm.sh/@rexa-developer/tiks'
+  bindTiks()
+</script>
+```
+
+Supported values: `click`, `success`, `error`, `warning`, `hover`, `pop`, `swoosh`, `notify`, `toggle`, `toggle-on`, `toggle-off`. Unknown values are silently ignored.
+
+The `toggle` value auto-detects state: for `<input type="checkbox">` it reads `el.checked` (which reflects the new state after the click); for other elements it reads `aria-pressed="true/false"`. **Caveat:** if you use `aria-pressed` on a custom button, update the attribute before your click handler returns — or use the explicit `toggle-on` / `toggle-off` values instead.
+
+`bindTiks()` accepts an optional root element (defaults to `document`) and returns an unbind function: `const unbind = bindTiks(); /* later */ unbind()`.
+
 ## Accessibility
 
 - **`prefers-reduced-motion`**: Respected by default — auto-mutes and reacts to runtime preference changes. Pass `respectReducedMotion: false` to opt out.

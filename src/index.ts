@@ -25,3 +25,6 @@ export function mute() { tiks.mute() }
 export function unmute() { tiks.unmute() }
 export function setVolume(v: number) { tiks.setVolume(v) }
 export function setTheme(t: ThemeName | TiksTheme) { tiks.setTheme(t) }
+
+// Declarative auto-binding
+export { bindTiks } from './bind'
