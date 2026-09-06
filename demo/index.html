@@ -315,8 +315,8 @@
       grid-template-columns: min-content 1fr min-content;
       gap: 0.75rem;
 
-      & label {
-          text-wrap: nowrap;
+      & .field-label {
+        text-wrap: nowrap;
       }
 
       & .wide {
@@ -601,13 +601,13 @@
     })
 
     // Theme switcher
-    document.querySelectorAll('.theme-btn').forEach(btn => {
+    document.querySelectorAll('.theme-btn[data-theme]').forEach(btn => {
       btn.addEventListener('click', () => {
-        document.querySelectorAll('.theme-btn').forEach(b => b.classList.remove('active'))
+        document.querySelectorAll('.theme-btn[data-theme]').forEach(b => b.classList.remove('active'))
         btn.classList.add('active')
-        if (btn.dataset.theme !== "custom") {
-            tiks.setTheme(btn.dataset.theme)
-            document.getElementById("theme-editor").hidden = true
+        if (btn.dataset.theme !== 'custom') {
+          tiks.setTheme(btn.dataset.theme)
+          document.getElementById('theme-editor').hidden = true
         } else initCustomTheme()
         tiks.click()
         triggerWave(0.5, 8)
@@ -659,16 +659,33 @@
       decay: [0.3, 1.5, 0.01],
       brightness: [1500, 5000, 1]
     }
+
+    // Snap to the slider's own step and clamp to its bounds, so the number box
+    // and the slider thumb can never disagree. toFixed kills the float noise
+    // that min + n * step introduces (0.00399 -> 0.0039900000000000005).
+    function snapToRange(value, [min, max, step]) {
+      const snapped = min + Math.round((value - min) / step) * step
+      const decimals = (String(step).split('.')[1] ?? '').length
+      return Number(Math.min(max, Math.max(min, snapped)).toFixed(decimals))
+    }
+
+    const randomInRange = property => {
+      const [min, max] = propertyRanges[property]
+      return snapToRange(min + Math.random() * (max - min), propertyRanges[property])
+    }
+    const randomOf = values => values[Math.floor(Math.random() * values.length)]
+
     function initCustomTheme() {
       const customThemeData = {
-        baseFreq: Math.floor(Math.random() * 200 + 400),
-        noiseColor: (['white', 'pink'])[Math.floor(Math.random() * 2)],
-        oscType: (['sine', 'triangle', 'square', 'sawtooth'])[Math.floor(Math.random() * 4)],
-        filterFreq: Math.floor(Math.random() * 5000 + 2000),
-        filterQ: Math.floor(Math.random() * 400 + 200) * 0.01,
-        attack: Math.floor(Math.random() * 400) * 0.00001,
-        decay: Math.floor(Math.random() * 100 + 50) * 0.01,
-        brightness: Math.floor(Math.random() * 4000 + 2000)
+        name: 'custom',
+        baseFreq: randomInRange('baseFreq'),
+        noiseColor: randomOf(['white', 'pink']),
+        oscType: randomOf(['sine', 'triangle', 'square', 'sawtooth']),
+        filterFreq: randomInRange('filterFreq'),
+        filterQ: randomInRange('filterQ'),
+        attack: randomInRange('attack'),
+        decay: randomInRange('decay'),
+        brightness: randomInRange('brightness')
       }
       const themeInputs = {
         baseFreq: [],
@@ -678,57 +695,99 @@
         decay: [],
         brightness: [],
       }
-      function updateTheme(property, value) {
-        customThemeData[property] = parseFloat(value) || value;
-        for (const listener of themeInputs[property] ?? []) listener.value = customThemeData[property]
+      // `source` is the control the edit came from — never write back to it, or
+      // typing in the number box fights the caret.
+      function updateTheme(property, value, source) {
+        const range = propertyRanges[property]
+        if (range) {
+          const parsed = parseFloat(value)
+          // Empty or non-numeric input: leave the theme alone. Letting "" or NaN
+          // through reaches Web Audio and throws on the next sound.
+          if (!Number.isFinite(parsed)) return
+          customThemeData[property] = snapToRange(parsed, range)
+        } else {
+          customThemeData[property] = value
+        }
+        for (const input of themeInputs[property] ?? []) {
+          if (input !== source) input.value = customThemeData[property]
+        }
         tiks.setTheme(customThemeData)
       }
 
       function createEditorSlider(property) {
+        const [min, max, step] = propertyRanges[property]
+
         const label = document.createElement('label')
+        label.className = 'field-label'
+        label.htmlFor = `theme-${property}`
         label.innerText = themeTranslations[property]
 
         const input = document.createElement('input')
         input.type = 'range'
-        input.min = propertyRanges[property][0]
-        input.max = propertyRanges[property][1]
-        input.step = propertyRanges[property][2]
+        input.id = `theme-${property}`
+        input.min = min
+        input.max = max
+        input.step = step
         input.value = customThemeData[property]
         input.addEventListener('input', () => {
-          updateTheme(property, input.value)
+          updateTheme(property, input.value, input)
         })
 
         const display = document.createElement('input')
-        display.value = customThemeData[property].toString().replaceAll(/0{7,}\d/g,"")
+        display.type = 'number'
+        display.min = min
+        display.max = max
+        display.step = step
+        display.setAttribute('aria-label', themeTranslations[property])
+        display.value = customThemeData[property]
         display.addEventListener('input', () => {
-          updateTheme(property, display.value)
+          updateTheme(property, display.value, display)
+        })
+        // Typing is left alone as it happens; on commit, show what actually
+        // landed — including snapping back if the box was cleared or out of range.
+        display.addEventListener('change', () => {
+          updateTheme(property, display.value, null)
+          display.value = customThemeData[property]
         })
 
         themeInputs[property].push(input, display)
 
         return [label, input, display]
       }
-      function createButtonList(property, values){
-          const label = document.createElement('label')
-          label.innerText = themeTranslations[property]
+      function createButtonList(property, values) {
+        const label = document.createElement('span')
+        label.className = 'field-label'
+        label.id = `theme-${property}-label`
+        label.innerText = themeTranslations[property]
 
-          const container = document.createElement("span")
-          container.classList = 'theme-switcher wide'
+        const container = document.createElement('span')
+        container.className = 'theme-switcher wide'
+        container.setAttribute('role', 'group')
+        container.setAttribute('aria-labelledby', label.id)
 
-          for (const value of values) {
-            const button = document.createElement("button")
-            button.classList = 'theme-btn' + (value === customThemeData[property] ? ' active' : '')
-            button.innerText = themeTranslations[value]
-            button.addEventListener('click', () => {
-              for (const child of container.childNodes) child.classList = 'theme-btn'
-              button.classList = 'theme-btn active'
-              updateTheme(property, value)
-            })
-
-            container.append(button)
+        for (const value of values) {
+          const button = document.createElement('button')
+          button.className = 'theme-btn'
+          button.setAttribute('aria-pressed', 'false')
+          button.innerText = themeTranslations[value]
+          const select = () => {
+            for (const sibling of container.children) {
+              sibling.className = 'theme-btn'
+              sibling.setAttribute('aria-pressed', 'false')
+            }
+            button.className = 'theme-btn active'
+            button.setAttribute('aria-pressed', 'true')
           }
+          button.addEventListener('click', () => {
+            select()
+            updateTheme(property, value)
+          })
+          if (value === customThemeData[property]) select()
 
-          return [label, container]
+          container.append(button)
+        }
+
+        return [label, container]
       }
 
       const editorGrid = document.querySelector('.editor-grid')
