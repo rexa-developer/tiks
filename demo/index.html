@@ -308,6 +308,31 @@
       accent-color: var(--accent);
     }
 
+    /* Editor */
+
+    .editor-grid{
+      display: grid;
+      grid-template-columns: min-content 1fr min-content;
+      gap: 0.75rem;
+
+      & .field-label {
+        text-wrap: nowrap;
+      }
+
+      & .wide {
+        grid-column: span 2;
+      }
+
+      & input:not([type=range]) {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        color: var(--text);
+        padding: 0 1rem;
+        width: 100px;
+      }
+    }
+
     /* Footer */
     footer {
       text-align: center;
@@ -362,6 +387,12 @@
         <button class="theme-btn" data-theme="crisp">Crisp</button>
         <button class="theme-btn" data-theme="arcade">Arcade</button>
         <button class="theme-btn" data-theme="glass">Glass</button>
+        <button class="theme-btn" data-theme="custom">Custom</button>
+      </div>
+    </section>
+
+    <section id="theme-editor" hidden>
+      <div class="editor-grid">
       </div>
     </section>
 
@@ -570,11 +601,14 @@
     })
 
     // Theme switcher
-    document.querySelectorAll('.theme-btn').forEach(btn => {
+    document.querySelectorAll('.theme-btn[data-theme]').forEach(btn => {
       btn.addEventListener('click', () => {
-        document.querySelectorAll('.theme-btn').forEach(b => b.classList.remove('active'))
+        document.querySelectorAll('.theme-btn[data-theme]').forEach(b => b.classList.remove('active'))
         btn.classList.add('active')
-        tiks.setTheme(btn.dataset.theme)
+        if (btn.dataset.theme !== 'custom') {
+          tiks.setTheme(btn.dataset.theme)
+          document.getElementById('theme-editor').hidden = true
+        } else initCustomTheme()
         tiks.click()
         triggerWave(0.5, 8)
       })
@@ -598,6 +632,174 @@
       triggerWave(0.8, 6)
       setTimeout(() => btn.textContent = 'Copy', 1500)
     })
+
+    // Custom theme
+    const themeTranslations = {
+      baseFreq: 'Base Frequency',
+      noiseColor: 'Noise Color',
+      oscType: 'Oscillator Type',
+      filterFreq: 'Filter Frequency',
+      filterQ: 'Filter Resonance',
+      attack: 'Attack Time',
+      decay: 'Decay Time',
+      brightness: 'Brightness',
+
+      white: 'White',
+      pink: 'Pink',
+      sine: 'Sine',
+      triangle: 'Triangle',
+      square: 'Square',
+      sawtooth: 'Sawtooth'
+    }
+    const propertyRanges = {
+      baseFreq: [150, 500, 1],
+      filterFreq: [1500, 6000, 1],
+      filterQ: [1, 5, 0.01],
+      attack: [0.00001, 0.005, 0.00001],
+      decay: [0.3, 1.5, 0.01],
+      brightness: [1500, 5000, 1]
+    }
+
+    // Snap to the slider's own step and clamp to its bounds, so the number box
+    // and the slider thumb can never disagree. toFixed kills the float noise
+    // that min + n * step introduces (0.00399 -> 0.0039900000000000005).
+    function snapToRange(value, [min, max, step]) {
+      const snapped = min + Math.round((value - min) / step) * step
+      const decimals = (String(step).split('.')[1] ?? '').length
+      return Number(Math.min(max, Math.max(min, snapped)).toFixed(decimals))
+    }
+
+    const randomInRange = property => {
+      const [min, max] = propertyRanges[property]
+      return snapToRange(min + Math.random() * (max - min), propertyRanges[property])
+    }
+    const randomOf = values => values[Math.floor(Math.random() * values.length)]
+
+    function initCustomTheme() {
+      const customThemeData = {
+        name: 'custom',
+        baseFreq: randomInRange('baseFreq'),
+        noiseColor: randomOf(['white', 'pink']),
+        oscType: randomOf(['sine', 'triangle', 'square', 'sawtooth']),
+        filterFreq: randomInRange('filterFreq'),
+        filterQ: randomInRange('filterQ'),
+        attack: randomInRange('attack'),
+        decay: randomInRange('decay'),
+        brightness: randomInRange('brightness')
+      }
+      const themeInputs = {
+        baseFreq: [],
+        filterFreq: [],
+        filterQ: [],
+        attack: [],
+        decay: [],
+        brightness: [],
+      }
+      // `source` is the control the edit came from — never write back to it, or
+      // typing in the number box fights the caret.
+      function updateTheme(property, value, source) {
+        const range = propertyRanges[property]
+        if (range) {
+          const parsed = parseFloat(value)
+          // Empty or non-numeric input: leave the theme alone. Letting "" or NaN
+          // through reaches Web Audio and throws on the next sound.
+          if (!Number.isFinite(parsed)) return
+          customThemeData[property] = snapToRange(parsed, range)
+        } else {
+          customThemeData[property] = value
+        }
+        for (const input of themeInputs[property] ?? []) {
+          if (input !== source) input.value = customThemeData[property]
+        }
+        tiks.setTheme(customThemeData)
+      }
+
+      function createEditorSlider(property) {
+        const [min, max, step] = propertyRanges[property]
+
+        const label = document.createElement('label')
+        label.className = 'field-label'
+        label.htmlFor = `theme-${property}`
+        label.innerText = themeTranslations[property]
+
+        const input = document.createElement('input')
+        input.type = 'range'
+        input.id = `theme-${property}`
+        input.min = min
+        input.max = max
+        input.step = step
+        input.value = customThemeData[property]
+        input.addEventListener('input', () => {
+          updateTheme(property, input.value, input)
+        })
+
+        const display = document.createElement('input')
+        display.type = 'number'
+        display.min = min
+        display.max = max
+        display.step = step
+        display.setAttribute('aria-label', themeTranslations[property])
+        display.value = customThemeData[property]
+        display.addEventListener('input', () => {
+          updateTheme(property, display.value, display)
+        })
+        // Typing is left alone as it happens; on commit, show what actually
+        // landed — including snapping back if the box was cleared or out of range.
+        display.addEventListener('change', () => {
+          updateTheme(property, display.value, null)
+          display.value = customThemeData[property]
+        })
+
+        themeInputs[property].push(input, display)
+
+        return [label, input, display]
+      }
+      function createButtonList(property, values) {
+        const label = document.createElement('span')
+        label.className = 'field-label'
+        label.id = `theme-${property}-label`
+        label.innerText = themeTranslations[property]
+
+        const container = document.createElement('span')
+        container.className = 'theme-switcher wide'
+        container.setAttribute('role', 'group')
+        container.setAttribute('aria-labelledby', label.id)
+
+        for (const value of values) {
+          const button = document.createElement('button')
+          button.className = 'theme-btn'
+          button.setAttribute('aria-pressed', 'false')
+          button.innerText = themeTranslations[value]
+          const select = () => {
+            for (const sibling of container.children) {
+              sibling.className = 'theme-btn'
+              sibling.setAttribute('aria-pressed', 'false')
+            }
+            button.className = 'theme-btn active'
+            button.setAttribute('aria-pressed', 'true')
+          }
+          button.addEventListener('click', () => {
+            select()
+            updateTheme(property, value)
+          })
+          if (value === customThemeData[property]) select()
+
+          container.append(button)
+        }
+
+        return [label, container]
+      }
+
+      const editorGrid = document.querySelector('.editor-grid')
+      editorGrid.innerText = ''
+
+      editorGrid.append(...createButtonList('noiseColor', ['white', 'pink']))
+      editorGrid.append(...createButtonList('oscType', ['sine', 'triangle', 'square', 'sawtooth']))
+      for (const property in themeInputs) editorGrid.append(...createEditorSlider(property))
+
+      document.getElementById('theme-editor').hidden = false
+      tiks.setTheme(customThemeData)
+    }
   </script>
 </body>
 </html>
